@@ -1,3 +1,6 @@
+/* ==========================================================================
+   1. GLOBAL RESETS & THEME DEFINITIONS
+   ========================================================================== */
 * {
   margin: 0;
   padding: 0;
@@ -12,9 +15,12 @@ html {
 body {
   background: #0f172a;
   color: white;
+  padding-top: 73px; /* Prevents hero content from hiding behind fixed header */
 }
 
-/* NAVBAR */
+/* ==========================================================================
+   2. NAVIGATION HEADER & GLOBAL HAMBURGER DRAWER
+   ========================================================================== */
 header {
   width: 100%;
   display: flex;
@@ -34,21 +40,9 @@ header {
   color: #38bdf8;
 }
 
-nav a {
-  color: white;
-  text-decoration: none;
-  margin-left: 25px;
-  transition: 0.3s;
-  font-weight: 500;
-}
-
-nav a:hover {
-  color: #38bdf8;
-}
-
-/* HAMBURGER MENU BUTTON */
+/* Force the hamburger icon button to show on ALL screens */
 .menu-toggle {
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 6px;
   cursor: pointer;
@@ -67,7 +61,7 @@ nav a:hover {
   transition: 0.3s ease-in-out;
 }
 
-/* Animated Hamburger Morphing into an 'X' symbol */
+/* Animated Hamburger Morphing into an 'X' symbol when clicked */
 .menu-toggle.active span:nth-child(1) {
   transform: translateY(9px) rotate(45deg);
   background-color: #38bdf8;
@@ -82,13 +76,53 @@ nav a:hover {
   background-color: #38bdf8;
 }
 
-/* HERO SECTION */
+/* Navigation Overlay Menu Panel (Hidden off-screen on the left by default) */
+nav {
+  position: fixed;
+  top: 73px;
+  left: -100%;
+  width: 100%;
+  height: calc(100vh - 73px);
+  background: #111827;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 50px;
+  gap: 30px;
+  transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+  border-top: 1px solid #1e293b;
+  display: flex;
+}
+
+/* Slides the drawer menu out when the active class token is attached by JS */
+nav.active {
+  left: 0;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 22px;
+  width: 100%;
+  text-align: center;
+  padding: 10px 0;
+  transition: 0.3s;
+}
+
+nav a:hover {
+  color: #38bdf8;
+}
+
+/* ==========================================================================
+   3. HERO SECTION
+   ========================================================================== */
 .hero {
-  min-height: 100vh;
+  min-height: calc(100vh - 73px);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 120px 8%;
+  padding: 60px 8%;
   gap: 40px;
 }
 
@@ -104,11 +138,13 @@ nav a:hover {
 .hero-text h1 {
   font-size: 65px;
   color: #38bdf8;
+  line-height: 1.1;
 }
 
 .hero-text h2 {
   font-size: 32px;
-  margin: 10px 0;
+  margin: 15px 0;
+  color: #e2e8f0;
 }
 
 .hero-text p {
@@ -131,6 +167,7 @@ nav a:hover {
   font-weight: 600;
   margin-right: 15px;
   transition: 0.3s;
+  display: inline-block;
 }
 
 .btn:hover {
@@ -144,6 +181,7 @@ nav a:hover {
   text-decoration: none;
   border-radius: 8px;
   transition: 0.3s;
+  display: inline-block;
 }
 
 .btn-outline:hover {
@@ -151,14 +189,15 @@ nav a:hover {
   color: black;
 }
 
-/* HERO IMAGE */
 .hero-image img {
   width: 350px;
   border-radius: 20px;
   box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
 }
 
-/* GENERAL SECTION STYLING */
+/* ==========================================================================
+   4. SECTIONS COMMON LAYOUT
+   ========================================================================== */
 section {
   padding: 100px 8%;
 }
@@ -183,7 +222,9 @@ section {
   font-size: 18px;
 }
 
-/* SKILLS SECTION */
+/* ==========================================================================
+   5. SKILLS GRID
+   ========================================================================== */
 .skills-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -208,7 +249,9 @@ section {
   font-size: 22px;
 }
 
-/* PROJECTS SECTION */
+/* ==========================================================================
+   6. PROJECTS GRID
+   ========================================================================== */
 .project-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -242,7 +285,9 @@ section {
   color: #cbd5e1;
 }
 
-/* CONTACT GRID */
+/* ==========================================================================
+   7. CONTACT WRAPPER & RESPONSIVE FORM
+   ========================================================================== */
 .contact-wrapper {
   max-width: 950px;
   margin: auto;
@@ -284,7 +329,6 @@ section {
   color: #38bdf8;
 }
 
-/* FORM LAYOUT */
 .form-container {
   width: 100%;
 }
@@ -345,7 +389,7 @@ section {
   resize: none;
 }
 
-/* Formspree Invalid Visual Feedback styling rules */
+/* Formspree Validation Engine States */
 .form-group [aria-invalid="true"] {
   box-shadow: 0 0 0 2px #ef4444 !important;
 }
@@ -378,7 +422,6 @@ section {
   cursor: not-allowed;
 }
 
-/* Notification Alert Styling */
 .form-alert {
   padding: 16px;
   border-radius: 10px;
@@ -399,7 +442,9 @@ section {
   color: #fca5a5;
 }
 
-/* FOOTER */
+/* ==========================================================================
+   8. FOOTER
+   ========================================================================== */
 footer {
   text-align: center;
   padding: 40px 20px;
@@ -423,52 +468,19 @@ footer .footer-contacts a:hover {
   color: white;
 }
 
-/* RESPONSIVE DISPLAY CONSTRAINTS (MOBILE BREAKPOINT) */
+/* ==========================================================================
+   9. MEDIA QUERIES (RESPONSIVE ALIGNMENTS FOR MOBILE & TABLETS)
+   ========================================================================== */
 @media(max-width: 900px) {
   header {
     padding: 20px 5%;
   }
 
-  /* Expose Hamburger Button Trigger */
-  .menu-toggle {
-    display: flex;
-  }
-
-  /* Transition standard Nav strip into a Slide-out Drawer Panel Overlap */
-  nav {
-    position: fixed;
-    top: 73px;
-    left: -100%;
-    width: 100%;
-    height: calc(100vh - 73px);
-    background: #111827;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding-top: 50px;
-    gap: 30px;
-    transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
-    border-top: 1px solid #1e293b;
-    display: flex; /* Override layout stream */
-  }
-
-  /* Slide drawer out when active class token is appended */
-  nav.active {
-    left: 0;
-  }
-
-  nav a {
-    margin-left: 0;
-    font-size: 22px;
-    width: 100%;
-    text-align: center;
-    padding: 10px 0;
-  }
-
   .hero {
     flex-direction: column;
     text-align: center;
-    padding-top: 160px;
+    padding-top: 40px;
+    justify-content: center;
   }
 
   .hero-text h1 {

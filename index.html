@@ -6,7 +6,7 @@
   <title>JoyTech Portfolio</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2=family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css">
 </head>
@@ -124,7 +124,7 @@
 
       <div class="form-container">
         <div id="successAlert" class="form-alert success-message" style="display: none;">
-          ✓ Message sent successfully! Stored securely in the Neon SQL Database.
+          ✓ Message sent successfully! I will get back to you shortly.
         </div>
         <div id="errorAlert" class="form-alert error-message" style="display: none;">
           ✗ Failed to send. Please check your connectivity and try again.
@@ -175,7 +175,7 @@
   </footer>
 
   <script>
-    // 1. HAMBURGER SLIDE ANIMATION LOGIC
+    // 1. MOBILE RESPONSIVE NAVIGATION CONTROL
     const menuToggle = document.querySelector('.menu-toggle');
     const mainNav = document.getElementById('main-navigation');
     const navLinks = document.querySelectorAll('#main-navigation a');
@@ -185,7 +185,7 @@
       mainNav.classList.toggle('active');
     });
 
-    // Auto-closes the slide drawer when clicking any anchor link item
+    // Auto-closes sidebar drawer panel when user clicks an option link
     navLinks.forEach(link => {
       link.addEventListener('click', () => {
         menuToggle.classList.remove('active');
@@ -193,7 +193,7 @@
       });
     });
 
-    // 2. LIVE NEON SQL DATABASE FORM PIPELINE
+    // 2. CONTACT DATA BACKEND TRANSFERS
     const contactForm = document.getElementById('contact-form');
     const successAlert = document.getElementById('successAlert');
     const errorAlert = document.getElementById('errorAlert');
@@ -202,23 +202,21 @@
     contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Retrieve text input values
       const name = document.getElementById('name').value;
       const email = document.getElementById('email').value;
       const service = document.getElementById('service').value;
       const messageText = document.getElementById('message').value;
 
-      // Combine layout choice and notes into a unified message parameter for your database structure
+      // Unifies layout selection tags with raw input strings inside database
       const message = `[Service: ${service}] ${messageText}`;
 
-      // Visual loading state transitions
+      // Loading state setups
       submitBtn.disabled = true;
       submitBtn.textContent = 'Sending...';
       successAlert.style.display = 'none';
       errorAlert.style.display = 'none';
 
       try {
-        // Direct internal post query to your active server architecture
         const response = await fetch('/api/contact', {
           method: 'POST',
           headers: {
@@ -233,11 +231,11 @@
           successAlert.style.display = 'block';
           contactForm.reset();
         } else {
-          throw new Error(result.error || 'Database transaction error.');
+          throw new Error(result.error || 'Server processing error.');
         }
       } catch (err) {
-        console.error('Submission processing error:', err);
-        errorAlert.textContent = `✗ Error: ${err.message || 'Unable to sync with database service.'}`;
+        console.error('Submission handling trace:', err);
+        errorAlert.textContent = `✗ Error: ${err.message || 'Unable to sync with your website server.'}`;
         errorAlert.style.display = 'block';
       } finally {
         submitBtn.disabled = false;

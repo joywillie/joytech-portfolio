@@ -6,14 +6,14 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware
+// Middleware 
 app.use(cors());
 app.use(express.json());
 
-// Serve Frontend static assets
-app.use(express.static(__dirname));
+// Serve Static Site Files
+app.use(express.static(path.join(__dirname)));
 
-// Database Connection Configuration (Neon Console DB)
+// Neon SQL Cloud Database Connection Matrix
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -21,10 +21,10 @@ const pool = new Pool({
     }
 });
 
-// Automatically initialize tables on system startup
+// Structural initialization checks for database tables
 const initDB = async () => {
     try {
-        // Core Form Leads Table
+        // Form messaging leads table
         await pool.query(`
             CREATE TABLE IF NOT EXISTS messages (
                 id SERIAL PRIMARY KEY,
@@ -34,7 +34,7 @@ const initDB = async () => {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
-        // Authentication Account Matrix
+        // User account credential matrix table
         await pool.query(`
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
@@ -44,19 +44,23 @@ const initDB = async () => {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
-        console.log("Neon PostgreSQL infrastructure synchronized successfully.");
+        console.log("Neon database structures deployed cleanly.");
     } catch (err) {
-        console.error("Database initialization fault:", err);
+        console.error("Infrastructure synchronization error:", err);
     }
 };
 initDB();
 
-// SERVE ROOT PORTFOLIO INDEX ARCHITECTURE
+/* ==========================================================================
+   ROUTING AND URL MAPPING HANDLING
+   ========================================================================== */
+
+// Serve Home Portfolio Page
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// SERVE AUTHENTICATION PAGE ROUTE
+// Serve Onboarding/Auth Portal Page
 app.get('/auth', (req, res) => {
     res.sendFile(path.join(__dirname, 'auth.html'));
 });
@@ -65,11 +69,11 @@ app.get('/auth', (req, res) => {
    AUTHENTICATION API SERVICE PIPELINES
    ========================================================================== */
 
-// 1. REGISTRATION ENDPOINT (SIGN UP)
+// 1. SIGN UP ENDPOINT (Account Generation)
 app.post('/api/auth/signup', async (req, res) => {
     const { username, email, password } = req.body;
     if (!username || !email || !password) {
-        return res.status(400).json({ error: "All account fields are mandatory fields." });
+        return res.status(400).json({ error: "All account parameters are required fields." });
     }
 
     try {
@@ -77,27 +81,27 @@ app.post('/api/auth/signup', async (req, res) => {
         const result = await pool.query(queryText, [username.trim().toLowerCase(), email.trim().toLowerCase(), password]);
         res.status(201).json({ success: true, user: result.rows[0] });
     } catch (err) {
-        if(err.code === '23505') { // Code for duplicate item violations
-            return res.status(400).json({ error: "Username or email string already exists in records." });
+        if (err.code === '23505') { // Code for item redundancy (unique violations)
+            return res.status(400).json({ error: "That username string or email identifier is already in use." });
         }
-        res.status(500).json({ error: "Database transaction error processing sign-up." });
+        res.status(500).json({ error: "Database transaction fault during account registration." });
     }
 });
 
-// 2. VALIDATION ENDPOINT (SIGN IN)
+// 2. SIGN IN ENDPOINT (Credential validation checks)
 app.post('/api/auth/signin', async (req, res) => {
     const { userKey, password } = req.body;
     if (!userKey || !password) {
-        return res.status(400).json({ error: "Credentials must contain user tags and credentials." });
+        return res.status(400).json({ error: "Identification keys and password parameters are required." });
     }
 
     try {
-        // Query allows looking up account records via user parameters or email parameters
+        // Allows login validation using username input or matching email input strings
         const queryText = 'SELECT * FROM users WHERE username = $1 OR email = $1';
         const result = await pool.query(queryText, [userKey.trim().toLowerCase()]);
 
         if (result.rows.length === 0 || result.rows[0].password !== password) {
-            return res.status(401).json({ error: "Invalid user identifiers or password credentials matches." });
+            return res.status(401).json({ error: "Invalid username/email or password credentials." });
         }
 
         const user = result.rows[0];
@@ -106,35 +110,32 @@ app.post('/api/auth/signin', async (req, res) => {
             user: { id: user.id, username: user.username, email: user.email }
         });
     } catch (err) {
-        res.status(500).json({ error: "Server process fault parsing signature authentication requests." });
+        res.status(500).json({ error: "Server process fault running identity verification." });
     }
 });
 
-// 3. OVERWRITE PIPELINE ENGINE (FORGOT PASSWORD ALTERATIONS)
+// 3. FORGOT PASSWORD OVERWRITE PIPELINE
 app.post('/api/auth/forgot', async (req, res) => {
     const { email, newPassword } = req.body;
     if (!email || !newPassword) {
-        return res.status(400).json({ error: "Target email mapping and key replacements are mandatory parameters." });
+        return res.status(400).json({ error: "Target email mappings and replacement keys are required parameters." });
     }
 
     try {
-        const checkQuery = 'SELECT id FROM users WHERE email = $1';
-        const checkRes = await pool.query(checkQuery, [email.trim().toLowerCase()]);
-
+        const checkRes = await pool.query('SELECT id FROM users WHERE email = $1', [email.trim().toLowerCase()]);
         if (checkRes.rows.length === 0) {
-            return res.status(444).json({ error: "No account profile identified with matching email." });
+            return res.status(444).json({ error: "No profile matched that email record." });
         }
 
-        const updateQuery = 'UPDATE users SET password = $1 WHERE email = $2';
-        await pool.query(updateQuery, [newPassword, email.trim().toLowerCase()]);
-        res.status(200).json({ success: true, message: "Target password block rewritten safely." });
+        await pool.query('UPDATE users SET password = $1 WHERE email = $2', [newPassword, email.trim().toLowerCase()]);
+        res.status(200).json({ success: true, message: "Credential replacement written successfully." });
     } catch (err) {
-        res.status(500).json({ error: "Server structural database record writing failure." });
+        res.status(500).json({ error: "Database mapping error changing target password strings." });
     }
 });
 
 /* ==========================================================================
-   FORM INCOMING SUBMISSION HANDLERS
+   CONTACT INCOMING INTERACTION CHANNELS
    ========================================================================== */
 app.post('/api/contact', async (req, res) => {
     const { name, email, message } = req.body;
@@ -142,18 +143,18 @@ app.post('/api/contact', async (req, res) => {
         const queryText = 'INSERT INTO messages(name, email, message) VALUES($1, $2, $3) RETURNING *';
         const result = await pool.query(queryText, [name, email, message]);
         
-        // Background Formspree API Relay Loop
+        // Background Formspree API Email Forwarder Link
         try {
             await fetch('https://formspree.io/f/xjgledbb', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({ name, email, message })
             });
-        } catch (e) { console.error("Formspree bridge pipeline idle.", e); }
+        } catch (e) { console.error("Formspree background route bypass.", e); }
 
         res.status(201).json({ success: true, data: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ error: "Lead processing failure sequence tripped." });
+        res.status(500).json({ error: "Database writing failure storing lead." });
     }
 });
 
@@ -162,10 +163,11 @@ app.get('/api/messages', async (req, res) => {
         const result = await pool.query('SELECT * FROM messages ORDER BY created_at DESC');
         res.json(result.rows);
     } catch (err) {
-        res.status(500).json({ error: "Database reading trace processing fault." });
+        res.status(500).json({ error: "Database scanning process error." });
     }
 });
 
+// Port runtime parameters configuration
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running successfully on port ${PORT}`);

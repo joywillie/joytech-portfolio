@@ -1,302 +1,275 @@
 /* ==========================================================================
-   1. GLOBAL RESETS & THEME DEFINITIONS
+   GLOBAL BRAND RULES & VARIABLES (Official University Palette)
    ========================================================================== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-}
-
-html {
-  scroll-behavior: smooth;
 }
 
 body {
-  background: #0f172a;
-  color: white;
-  padding-top: 73px; /* Prevents hero content from hiding behind fixed header */
-  overflow-x: hidden; /* Prevents horizontal scrollbars when menu is tucked away */
+  font-family: 'Poppins', sans-serif;
+  background-color: #0b1329; /* Dark Premium Canvas Background */
+  color: #f1f5f9;
+  line-height: 1.6;
+  overflow-x: hidden;
 }
 
 /* ==========================================================================
-   2. NAVIGATION HEADER & GLOBAL HAMBURGER DRAWER
+   HEADER NAVIGATION SCHEMES
    ========================================================================== */
 header {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
+  padding: 20px 10%;
+  background: rgba(11, 19, 41, 0.9);
+  backdrop-filter: blur(10px);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 8%;
-  background: #111827;
-  position: fixed;
-  top: 0;
   z-index: 1000;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 2px solid #1d4ed8; /* Deep Royal Blue Accent Line */
 }
 
 .logo {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
-  color: #38bdf8;
+  color: #fbbf24; /* Gold Profile Accent */
+  letter-spacing: 1px;
 }
 
-/* Force the hamburger icon button to show on ALL screens */
+#main-navigation a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-weight: 500;
+  margin-left: 30px;
+  transition: color 0.3s ease;
+}
+
+#main-navigation a:hover {
+  color: #fbbf24; /* Gold Highlight */
+}
+
+/* INTEGRATED NAVIGATION PORTAL BUTTON */
+.nav-portal-btn {
+  background-color: #1d4ed8; /* Deep Royal Blue */
+  color: #ffffff !important;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  margin-left: 20px !important;
+  transition: all 0.3s ease !important;
+  text-decoration: none;
+}
+
+.nav-portal-btn:hover {
+  background-color: #fbbf24 !important; /* Gold Pop on Hover */
+  color: #0b1329 !important;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+}
+
 .menu-toggle {
-  display: flex;
+  display: none;
   flex-direction: column;
-  gap: 6px;
-  cursor: pointer;
-  background: none;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  background: transparent;
   border: none;
-  padding: 5px;
-  z-index: 1100; /* Stays floating above the slide drawer */
+  cursor: pointer;
+  z-index: 1100;
 }
 
 .menu-toggle span {
-  display: block;
-  width: 30px;
-  height: 3px;
-  background-color: white;
-  border-radius: 3px;
-  transition: 0.3s ease-in-out;
-}
-
-/* Animated Hamburger Morphing into an 'X' symbol when clicked */
-.menu-toggle.active span:nth-child(1) {
-  transform: translateY(9px) rotate(45deg);
-  background-color: #38bdf8;
-}
-
-.menu-toggle.active span:nth-child(2) {
-  opacity: 0;
-}
-
-.menu-toggle.active span:nth-child(3) {
-  transform: translateY(-9px) rotate(-45deg);
-  background-color: #38bdf8;
-}
-
-/* Navigation Overlay Menu Panel (Styled as a clean right-side drawer panel) */
-nav {
-  position: fixed;
-  top: 0;                             /* Spans from the very top of the screen */
-  right: -100%;                       /* Hidden safely off-screen to the right side */
-  left: auto;                         /* Overrides original left alignment properties */
-  width: 280px;                       /* Custom narrow width bounds so homepage stays visible */
-  height: 100vh;                      /* Full screen viewport container height */
-  background: rgba(17, 24, 39, 0.96); /* Dark base with fine opacity to peek at homepage */
-  backdrop-filter: blur(8px);        /* Softly blurs your project cards underneath the panel */
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding-top: 100px;                 /* Extra space so links clear the absolute header items */
-  gap: 30px;
-  transition: right 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); /* Premium fluid transition curve */
-  border-left: 1px solid #1e293b;     /* Structural panel divider line */
-  display: flex;
-}
-
-/* Slides the drawer menu out when the active class token is attached by JS */
-nav.active {
-  right: 0;
-}
-
-nav a {
-  color: white;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 22px;
   width: 100%;
-  text-align: center;
-  padding: 10px 0;
-  transition: 0.3s;
-}
-
-nav a:hover {
-  color: #38bdf8;
+  height: 3px;
+  background-color: #f1f5f9;
+  border-radius: 2px;
+  transition: all 0.3s ease;
 }
 
 /* ==========================================================================
-   3. HERO SECTION
+   HERO FRAMEWORK
    ========================================================================== */
 .hero {
-  min-height: calc(100vh - 73px);
+  min-height: 100vh;
+  padding: 120px 10% 60px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 60px 8%;
+  justify-content: space-between;
   gap: 40px;
 }
 
-.hero-text {
-  flex: 1;
-}
-
 .hero-text h3 {
-  font-size: 25px;
-  margin-bottom: 10px;
+  font-size: 20px;
+  font-weight: 500;
+  color: #94a3b8;
 }
 
 .hero-text h1 {
-  font-size: 65px;
-  color: #38bdf8;
-  line-height: 1.1;
+  font-size: 48px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 5px 0;
 }
 
 .hero-text h2 {
-  font-size: 32px;
-  margin: 15px 0;
-  color: #e2e8f0;
+  font-size: 24px;
+  color: #1d4ed8; /* Deep Royal Blue */
+  font-weight: 600;
+  margin-bottom: 20px;
 }
 
 .hero-text p {
-  margin: 20px 0;
-  line-height: 1.8;
-  max-width: 600px;
-  color: #cbd5e1;
+  color: #94a3b8;
+  max-width: 500px;
+  margin-bottom: 30px;
 }
 
 .buttons {
-  margin-top: 30px;
+  display: flex;
+  gap: 15px;
 }
 
-.btn {
-  background: #38bdf8;
-  color: black;
-  padding: 14px 28px;
-  text-decoration: none;
-  border-radius: 8px;
+.btn, .btn-outline, .btn-submit {
+  padding: 12px 28px;
+  border-radius: 6px;
   font-weight: 600;
-  margin-right: 15px;
-  transition: 0.3s;
-  display: inline-block;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 15px;
 }
 
-.btn:hover {
-  background: white;
+.btn, .btn-submit {
+  background-color: #1d4ed8; /* Deep Royal Blue */
+  color: #ffffff;
+  border: none;
+}
+
+.btn:hover, .btn-submit:hover {
+  background-color: #fbbf24; /* Gold interactive pop */
+  color: #0b1329;
 }
 
 .btn-outline {
-  border: 2px solid #38bdf8;
-  color: #38bdf8;
-  padding: 12px 28px;
-  text-decoration: none;
-  border-radius: 8px;
-  transition: 0.3s;
-  display: inline-block;
+  border: 2px solid #1d4ed8;
+  color: #1d4ed8;
 }
 
 .btn-outline:hover {
-  background: #38bdf8;
-  color: black;
+  background-color: #1d4ed8;
+  color: #ffffff;
 }
 
 .hero-image img {
-  width: 350px;
-  border-radius: 20px;
-  box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid #1d4ed8;
+  box-shadow: 0 10px 30px rgba(29, 78, 216, 0.2);
 }
 
 /* ==========================================================================
-   4. SECTIONS COMMON LAYOUT
+   CONTENT DESIGN MODULES
    ========================================================================== */
 section {
-  padding: 100px 8%;
+  padding: 80px 10%;
 }
 
 .section-title {
-  margin-bottom: 50px;
   text-align: center;
+  margin-bottom: 50px;
 }
 
 .section-title h2 {
-  font-size: 42px;
-  color: #38bdf8;
+  font-size: 32px;
+  color: #ffffff;
+  display: inline-block;
+  border-bottom: 3px solid #fbbf24; /* Gold underline */
+  padding-bottom: 8px;
 }
 
-/* ABOUT SECTION */
 .about p {
-  max-width: 900px;
-  margin: auto;
   text-align: center;
-  line-height: 2;
-  color: #cbd5e1;
-  font-size: 18px;
+  max-width: 800px;
+  margin: 0 auto;
+  color: #94a3b8;
+  font-size: 17px;
 }
 
-/* ==========================================================================
-   5. SKILLS GRID
-   ========================================================================== */
 .skills-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
 }
 
 .skill-card {
-  background: #1e293b;
-  padding: 35px;
-  border-radius: 15px;
+  background: #111c3a;
+  padding: 25px;
   text-align: center;
-  transition: 0.3s;
-  border: 1px solid transparent;
+  border-radius: 8px;
+  border: 1px solid #1d4ed8;
+  transition: all 0.3s ease;
 }
 
 .skill-card:hover {
-  transform: translateY(-10px);
-  border-color: #38bdf8;
+  transform: translateY(-5px);
+  border-color: #fbbf24;
 }
 
 .skill-card h3 {
-  font-size: 22px;
+  font-size: 16px;
+  color: #f1f5f9;
 }
 
-/* ==========================================================================
-   6. PROJECTS GRID
-   ========================================================================== */
 .project-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 25px;
+  gap: 30px;
 }
 
 .project-card {
-  background: #1e293b;
-  border-radius: 15px;
+  background: #111c3a;
+  border-radius: 10px;
   overflow: hidden;
-  transition: 0.3s;
+  border: 1px solid #1d4ed8;
+  transition: transform 0.3s;
 }
 
 .project-card:hover {
-  transform: translateY(-10px);
+  transform: translateY(-5px);
+  border-color: #fbbf24;
 }
 
 .project-card img {
   width: 100%;
-  height: 220px;
+  height: 200px;
   object-fit: cover;
 }
 
 .project-card h3 {
-  padding: 20px 20px 10px;
-  color: #38bdf8;
+  padding: 20px 20px 5px;
+  color: #ffffff;
 }
 
 .project-card p {
-  padding: 0 20px 25px;
-  color: #cbd5e1;
+  padding: 0 20px 20px;
+  color: #94a3b8;
+  font-size: 14px;
 }
 
 /* ==========================================================================
-   7. CONTACT WRAPPER & RESPONSIVE FORM
+   INPUT FIELDS AND SYSTEM FORMS
    ========================================================================== */
 .contact-wrapper {
-  max-width: 950px;
-  margin: auto;
   display: grid;
   grid-template-columns: 1fr 1.5fr;
   gap: 40px;
+  align-items: start;
 }
 
 .contact-info {
@@ -306,34 +279,27 @@ section {
 }
 
 .info-item {
-  background: #1e293b;
+  background: #111c3a;
   padding: 20px;
-  border-radius: 12px;
-  border-left: 4px solid #38bdf8;
+  border-radius: 8px;
+  border: 1px solid #1d4ed8;
 }
 
 .info-item h4 {
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #38bdf8;
+  color: #fbbf24;
   margin-bottom: 5px;
 }
 
 .info-item a {
-  color: white;
+  color: #f1f5f9;
   text-decoration: none;
-  font-size: 16px;
-  font-weight: 500;
-  transition: 0.3s;
-}
-
-.info-item a:hover {
-  color: #38bdf8;
 }
 
 .form-container {
-  width: 100%;
+  background: #111c3a;
+  padding: 30px;
+  border-radius: 10px;
+  border: 1px solid #1d4ed8;
 }
 
 .custom-form {
@@ -344,167 +310,217 @@ section {
 
 .form-row {
   display: flex;
-  gap: 16px;
-}
-
-.form-row .form-group {
-  flex: 1;
+  gap: 20px;
 }
 
 .form-group {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .form-group label {
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 14px;
   color: #94a3b8;
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: 10px;
-  background: #1e293b;
-  color: white;
-  font-size: 16px;
-  transition: box-shadow 0.15s ease-in-out;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+.custom-form input, 
+.custom-form select, 
+.custom-form textarea {
+  background: #0b1329;
+  border: 1px solid #1d4ed8;
+  padding: 12px;
+  border-radius: 6px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 15px;
   outline: none;
-  box-shadow: 0 0 0 2px #38bdf8;
+  transition: border-color 0.3s;
 }
 
-.form-group select {
-  cursor: pointer;
+.custom-form input:focus, 
+.custom-form select:focus, 
+.custom-form textarea:focus {
+  border-color: #fbbf24; /* Gold on input focus */
 }
 
-.form-group textarea {
-  height: 180px;
+.custom-form textarea {
+  height: 120px;
   resize: none;
 }
 
-/* Formspree Validation Engine States */
-.form-group [aria-invalid="true"] {
-  box-shadow: 0 0 0 2px #ef4444 !important;
-}
-
-.field-error {
-  font-size: 0.8rem;
-  color: #ef4444;
-  margin-top: 2px;
-}
-
-.btn-submit {
-  background: #38bdf8;
-  color: black;
-  padding: 16px;
-  border: none;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.btn-submit:hover {
-  background: white;
-}
-
-.btn-submit:disabled {
-  background: #64748b;
-  color: #cbd5e1;
-  cursor: not-allowed;
-}
-
+/* DYNAMIC REQUEST NOTIFICATION LOG BANNER INTERFACES */
 .form-alert {
-  padding: 16px;
-  border-radius: 10px;
-  font-size: 0.95rem;
+  padding: 12px 15px;
+  border-radius: 6px;
+  font-size: 14px;
   margin-bottom: 20px;
   font-weight: 500;
 }
 
 .success-message {
-  background-color: #065f46;
-  border: 1px solid #34d399;
-  color: #a7f3d0;
+  background: rgba(4, 120, 87, 0.15); /* Emerald Green Tint */
+  color: #10b981; /* Emerald Green Text */
+  border: 1px solid #047857;
 }
 
 .error-message {
-  background-color: #991b1b;
-  border: 1px solid #f87171;
-  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid #ef4444;
 }
 
 /* ==========================================================================
-   8. FOOTER
+   FOOTER UTILITIES
    ========================================================================== */
 footer {
+  background: #060b18;
+  padding: 40px 10%;
   text-align: center;
-  padding: 40px 20px;
-  background: #111827;
-  color: #cbd5e1;
+  border-top: 2px solid #1d4ed8;
 }
 
-footer .footer-contacts {
+.footer-contacts {
   margin-bottom: 15px;
-  font-size: 14px;
 }
 
-footer .footer-contacts a {
-  color: #38bdf8;
+footer a {
+  color: #94a3b8;
   text-decoration: none;
   margin: 0 10px;
-  transition: 0.3s;
 }
 
-footer .footer-contacts a:hover {
-  color: white;
+footer a:hover {
+  color: #fbbf24;
+}
+
+footer p {
+  font-size: 14px;
+  color: #64748b;
 }
 
 /* ==========================================================================
-   9. MEDIA QUERIES (RESPONSIVE ALIGNMENTS FOR MOBILE & TABLETS)
+   PORTAL INTERFACE EXCLUSIVES
    ========================================================================== */
-@media(max-width: 900px) {
-  header {
-    padding: 20px 5%;
+.auth-container {
+  max-width: 430px;
+  margin: 100px auto;
+  padding: 40px 35px;
+  background-color: #111c3a;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  border-top: 4px solid #1d4ed8; /* Deep Royal Blue Brand Accent top line */
+}
+
+.auth-tabs {
+  display: flex;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #1d4ed8;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 600;
+  color: #64748b;
+  transition: color 0.3s ease;
+  font-size: 16px;
+}
+
+.auth-tab.active {
+  color: #fbbf24; /* Gold indicators on active choices */
+  border-bottom: 2px solid #fbbf24;
+}
+
+.hidden-panel {
+  display: none !important;
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 38px;
+  cursor: pointer;
+  color: #fbbf24;
+  font-size: 12px;
+  font-weight: 600;
+  user-select: none;
+  background: #0b1329;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.toggle-password:hover {
+  color: #ffffff;
+}
+
+.auth-toggle-link {
+  color: #1d4ed8;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.auth-toggle-link:hover {
+  color: #fbbf24;
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   MEDIA QUERY MEDIA CONSTRAINTS & RESPONSIVE LAYOUT BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 991px) {
+  header { padding: 20px 5%; }
+  .hero { padding: 120px 5% 60px; }
+  section { padding: 60px 5%; }
+}
+
+@media (max-width: 768px) {
+  .menu-toggle { display: flex; }
+  
+  #main-navigation {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 250px;
+    height: 100vh;
+    background: #0b1329;
+    border-left: 2px solid #1d4ed8;
+    display: flex;
+    flex-direction: column;
+    padding: 100px 30px;
+    gap: 25px;
+    transition: right 0.4s ease;
   }
+
+  #main-navigation.active { right: 0; }
+  #main-navigation a { margin-left: 0; font-size: 18px; }
+
+  .nav-portal-btn {
+    margin-left: 0 !important;
+    margin-top: 10px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .menu-toggle.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+  .menu-toggle.active span:nth-child(2) { opacity: 0; }
+  .menu-toggle.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
 
   .hero {
-    flex-direction: column;
+    flex-direction: column-reverse;
     text-align: center;
-    padding-top: 40px;
-    justify-content: center;
+    padding-top: 140px;
   }
 
-  .hero-text h1 {
-    font-size: 45px;
-  }
-
-  .hero-text h2 {
-    font-size: 25px;
-  }
-
-  .hero-image img {
-    width: 280px;
-  }
-
-  .contact-wrapper {
-    grid-template-columns: 1fr;
-    gap: 30px;
-  }
-
-  .form-row {
-    flex-direction: column;
-    gap: 20px;
-  }
+  .hero-text p { margin: 0 auto 30px; }
+  .buttons { justify-content: center; }
+  .contact-wrapper { grid-template-columns: 1fr; }
+  .form-row { flex-direction: column; gap: 20px; }
 }

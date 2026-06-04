@@ -12,6 +12,7 @@
 </head>
 <body>
 
+  <!-- HEADER NAVIGATION SYSTEM -->
   <header>
     <div class="logo">JoyTech</div>
     
@@ -27,9 +28,12 @@
       <a href="#skills">Skills</a>
       <a href="#projects">Projects</a>
       <a href="#contact">Contact</a>
+      <!-- Functional Portal Route Gateway -->
+      <a href="/auth" class="nav-portal-btn">Sign In</a>
     </nav>
   </header>
 
+  <!-- HERO SECTION -->
   <section class="hero" id="home">
     <div class="hero-text">
       <h3>Hello, I'm</h3>
@@ -50,6 +54,7 @@
     </div>
   </section>
 
+  <!-- ABOUT ME SECTION -->
   <section class="about" id="about">
     <div class="section-title">
       <h2>About Me</h2>
@@ -63,6 +68,7 @@
     </p>
   </section>
 
+  <!-- SKILLS SECTION -->
   <section class="skills" id="skills">
     <div class="section-title">
       <h2>My Skills</h2>
@@ -77,6 +83,7 @@
     </div>
   </section>
 
+  <!-- PROJECTS SECTION -->
   <section class="projects" id="projects">
     <div class="section-title">
       <h2>Projects</h2>
@@ -100,6 +107,7 @@
     </div>
   </section>
 
+  <!-- CONTACT ME SECTION -->
   <section class="contact" id="contact">
     <div class="section-title">
       <h2>Contact Me</h2>
@@ -123,6 +131,7 @@
       </div>
 
       <div class="form-container">
+        <!-- Live Request Feedback Banners -->
         <div id="successAlert" class="form-alert success-message" style="display: none;">
           ✓ Message sent successfully! I will get back to you shortly.
         </div>
@@ -165,6 +174,7 @@
     </div>
   </section>
 
+  <!-- FOOTER -->
   <footer>
     <div class="footer-contacts">
       <a href="tel:0745806435">Call</a> | 
@@ -175,7 +185,7 @@
   </footer>
 
   <script>
-    // 1. MOBILE RESPONSIVE NAVIGATION CONTROL
+    // 1. MOBILE RESPONSIVE HAMBURGER NAVIGATION DRAWER SYSTEM
     const menuToggle = document.querySelector('.menu-toggle');
     const mainNav = document.getElementById('main-navigation');
     const navLinks = document.querySelectorAll('#main-navigation a');
@@ -185,7 +195,6 @@
       mainNav.classList.toggle('active');
     });
 
-    // Auto-closes sidebar drawer panel when user clicks an option link
     navLinks.forEach(link => {
       link.addEventListener('click', () => {
         menuToggle.classList.remove('active');
@@ -193,7 +202,7 @@
       });
     });
 
-    // 2. CONTACT DATA BACKEND TRANSFERS
+    // 2. CONTACT TRANSACTION DATABASE ENGINE
     const contactForm = document.getElementById('contact-form');
     const successAlert = document.getElementById('successAlert');
     const errorAlert = document.getElementById('errorAlert');
@@ -207,10 +216,8 @@
       const service = document.getElementById('service').value;
       const messageText = document.getElementById('message').value;
 
-      // Unifies layout selection tags with raw input strings inside database
       const message = `[Service: ${service}] ${messageText}`;
 
-      // Loading state setups
       submitBtn.disabled = true;
       submitBtn.textContent = 'Sending...';
       successAlert.style.display = 'none';
@@ -219,9 +226,7 @@
       try {
         const response = await fetch('/api/contact', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, message })
         });
 
@@ -234,7 +239,7 @@
           throw new Error(result.error || 'Server processing error.');
         }
       } catch (err) {
-        console.error('Submission handling trace:', err);
+        console.error(err);
         errorAlert.textContent = `✗ Error: ${err.message || 'Unable to sync with your website server.'}`;
         errorAlert.style.display = 'block';
       } finally {

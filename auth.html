@@ -3,136 +3,228 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JoyTech - Portal Authentication</title>
+  <title>JoyTech - Authentication Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Direct Layout Integration matching your Deep Blue, Emerald Green & Gold theme */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: #0b1329;
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .portal-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .portal-header h1 {
+      color: #fbbf24; /* Gold Brand Logo Accent */
+      font-size: 28px;
+      margin-bottom: 5px;
+    }
+
+    .portal-header p {
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    /* Dual Grid Box to show both inputs simultaneously */
+    .portal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .auth-card {
+      background-color: #111c3a;
+      border: 1px solid #1d4ed8; /* Deep Royal Blue Border */
+      border-radius: 12px;
+      padding: 35px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-title {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #ffffff;
+      border-bottom: 2px solid #1d4ed8;
+      padding-bottom: 8px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .form-group input {
+      background: #0b1329;
+      border: 1px solid #1d4ed8;
+      padding: 12px;
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus {
+      border-color: #fbbf24; /* Gold glow on select */
+    }
+
+    .btn-action {
+      background-color: #1d4ed8;
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s ease;
+      margin-top: 5px;
+    }
+
+    .btn-action:hover {
+      background-color: #fbbf24;
+      color: #0b1329;
+    }
+
+    /* Alert Banner Classes */
+    .status-alert {
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      text-align: center;
+      display: none;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .success {
+      background: rgba(4, 120, 87, 0.15); /* Emerald Green Translucent */
+      color: #10b981;
+      border: 1px solid #047857;
+    }
+
+    .error {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid #ef4444;
+    }
+
+    .back-home {
+      margin-top: 30px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.3s;
+    }
+
+    .back-home:hover {
+      color: #fbbf24;
+    }
+
+    /* Responsive adjustment for phones */
+    @media (max-width: 768px) {
+      .portal-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+      }
+    }
+  </style>
 </head>
-<body style="background-color: #0b1329; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
+<body>
 
-  <div class="auth-container">
-    <div id="authTabs" class="auth-tabs">
-      <div class="auth-tab active" onclick="switchTab('signin')">Sign In</div>
-      <div class="auth-tab" onclick="switchTab('signup')">Sign Up</div>
-    </div>
+  <div class="portal-header">
+    <h1>JoyTech Gateways</h1>
+    <p>Sign in to your active portal or fill the form details to deploy a new profile account instantly.</p>
+  </div>
 
-    <div id="authSuccess" class="form-alert success-message" style="display: none;"></div>
-    <div id="authError" class="form-alert error-message" style="display: none;"></div>
+  <div id="portalAlert" class="status-alert"></div>
 
-    <div id="signinPanel">
-      <form id="signinForm" class="custom-form">
+  <div class="portal-grid">
+    
+    <div class="auth-card">
+      <div class="card-title">Sign In / Login</div>
+      <form id="signinForm">
         <div class="form-group">
           <label for="signinUser">Username or Email</label>
-          <input type="text" id="signinUser" placeholder="joytech_dev" required />
+          <input type="text" id="signinUser" placeholder="Enter username or email" required />
         </div>
-        <div class="form-group password-wrapper">
+        <div class="form-group">
           <label for="signinPassword">Password</label>
           <input type="password" id="signinPassword" placeholder="••••••••" required />
-          <span class="toggle-password" onclick="togglePasswordVisibility('signinPassword')">👁️ Show</span>
         </div>
-        <p style="text-align: right; margin-top: -5px;">
-          <span class="auth-toggle-link" onclick="switchTab('forgot')">Forgot Password?</span>
-        </p>
-        <button type="submit" id="signinBtn" class="btn-submit" style="width: 100%; margin-top: 10px;">Sign In</button>
+        <button type="submit" id="signinBtn" class="btn-action">Log In</button>
       </form>
     </div>
 
-    <div id="signupPanel" class="hidden-panel">
-      <form id="signupForm" class="custom-form">
+    <div class="auth-card">
+      <div class="card-title">Create Account / Sign Up</div>
+      <form id="signupForm">
         <div class="form-group">
-          <label for="signupUsername">Preferred Username</label>
-          <input type="text" id="signupUsername" placeholder="joytech_member" required />
+          <label for="signupUsername">Username</label>
+          <input type="text" id="signupUsername" placeholder="Create username" required />
         </div>
         <div class="form-group">
           <label for="signupEmail">Email Address</label>
           <input type="email" id="signupEmail" placeholder="client@example.com" required />
         </div>
-        <div class="form-group password-wrapper">
-          <label for="signupPassword">Secure Password</label>
+        <div class="form-group">
+          <label for="signupPassword">Password</label>
           <input type="password" id="signupPassword" placeholder="••••••••" required />
-          <span class="toggle-password" onclick="togglePasswordVisibility('signupPassword')">👁️ Show</span>
         </div>
-        <button type="submit" id="signupBtn" class="btn-submit" style="width: 100%; margin-top: 10px;">Create Account</button>
+        <button type="submit" id="signupBtn" class="btn-action">Register Profile</button>
       </form>
     </div>
 
-    <div id="forgotPanel" class="hidden-panel">
-      <h3 style="margin-bottom: 10px; color: #ffffff; font-size: 20px;">Reset Password</h3>
-      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px;">
-        Provide your registered email address below to overwrite your account records inside the database safely.
-      </p>
-      <form id="forgotForm" class="custom-form">
-        <div class="form-group">
-          <label for="forgotEmail">Email Address</label>
-          <input type="email" id="forgotEmail" placeholder="your-email@example.com" required />
-        </div>
-        <div class="form-group password-wrapper">
-          <label for="forgotNewPassword">New Password</label>
-          <input type="password" id="forgotNewPassword" placeholder="••••••••" required />
-          <span class="toggle-password" onclick="togglePasswordVisibility('forgotNewPassword')">👁️ Show</span>
-        </div>
-        <button type="submit" id="forgotBtn" class="btn-submit" style="width: 100%; margin-top: 10px;">Update Password</button>
-        <p style="text-align: center; margin-top: 15px;">
-          <span class="auth-toggle-link" onclick="switchTab('signin')">Back to Sign In</span>
-        </p>
-      </form>
-    </div>
   </div>
 
+  <a href="/" class="back-home">← Return to Main Portfolio Website</a>
+
   <script>
-    const successAlert = document.getElementById('authSuccess');
-    const errorAlert = document.getElementById('authError');
+    const alertBanner = document.getElementById('portalAlert');
 
-    // Tab Switching Machine Logic
-    function switchTab(mode) {
-      successAlert.style.display = 'none';
-      errorAlert.style.display = 'none';
-      
-      document.getElementById('signinPanel').classList.add('hidden-panel');
-      document.getElementById('signupPanel').classList.add('hidden-panel');
-      document.getElementById('forgotPanel').classList.add('hidden-panel');
-      document.getElementById('authTabs').style.display = 'flex';
-      
-      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-
-      if (mode === 'signin') {
-        document.getElementById('signinPanel').classList.remove('hidden-panel');
-        document.querySelectorAll('.auth-tab')[0].classList.add('active');
-      } else if (mode === 'signup') {
-        document.getElementById('signupPanel').classList.remove('hidden-panel');
-        document.querySelectorAll('.auth-tab')[1].classList.add('active');
-      } else if (mode === 'forgot') {
-        document.getElementById('forgotPanel').classList.remove('hidden-panel');
-        document.getElementById('authTabs').style.display = 'none';
-      }
-    }
-
-    // Dynamic Masking Utility Toggle (Show/Hide Text while typing)
-    function togglePasswordVisibility(fieldId) {
-      const passwordField = document.getElementById(fieldId);
-      const toggleBtn = passwordField.nextElementSibling;
-      if (passwordField.type === "password") {
-        passwordField.type = "text";
-        toggleBtn.textContent = "🙈 Hide";
-      } else {
-        passwordField.type = "password";
-        toggleBtn.textContent = "👁️ Show";
-      }
-    }
-
-    const showAlert = (isSuccess, text) => {
+    function displayMessage(isSuccess, messageText) {
+      alertBanner.textContent = messageText;
+      alertBanner.style.display = 'block';
       if (isSuccess) {
-        successAlert.style.display = 'block';
-        successAlert.textContent = text;
-        errorAlert.style.display = 'none';
+        alertBanner.className = 'status-alert success';
       } else {
-        errorAlert.style.display = 'block';
-        errorAlert.textContent = text;
-        successAlert.style.display = 'none';
+        alertBanner.className = 'status-alert error';
       }
-    };
+      // Scroll to view the notification cleanly
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-    // 1. SIGN UP SUBMISSION ENGINE (Forwards to login page)
+    // 1. SIGN UP DISPATCH HANDLER (Flashes notice upon completion)
     document.getElementById('signupForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const username = document.getElementById('signupUsername').value;
@@ -141,7 +233,8 @@
       const btn = document.getElementById('signupBtn');
 
       btn.disabled = true;
-      btn.textContent = 'Processing...';
+      btn.textContent = 'Registering Account...';
+      alertBanner.style.display = 'none';
 
       try {
         const response = await fetch('/api/auth/signup', {
@@ -153,24 +246,19 @@
         
         if (response.ok) {
           document.getElementById('signupForm').reset();
-          showAlert(true, "✓ Registration successful! Sending you to Sign In screen...");
-          
-          // Smoothly shifts focus to the Sign In layout after 2 seconds
-          setTimeout(() => {
-            switchTab('signin');
-            showAlert(true, "Profile generated successfully! Use your new credentials to log in.");
-          }, 2000);
-          
-        } else { throw new Error(result.error || 'Registration failed.'); }
-      } catch (err) { 
-        showAlert(false, `✗ Error: ${err.message}`); 
+          displayMessage(true, "✓ Sign Up complete! Account added to Neon database. Please use the left column form to log in.");
+        } else {
+          throw new Error(result.error || 'Account generation fault.');
+        }
+      } catch (err) {
+        displayMessage(false, `✗ Sign Up Error: ${err.message}`);
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Create Account';
+        btn.textContent = 'Register Profile';
       }
     });
 
-    // 2. SIGN IN SUBMISSION ENGINE (Forwards to main portfolio layout)
+    // 2. SIGN IN DISPATCH HANDLER (Redirects to Portfolio Root Website)
     document.getElementById('signinForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const userKey = document.getElementById('signinUser').value;
@@ -178,7 +266,8 @@
       const btn = document.getElementById('signinBtn');
 
       btn.disabled = true;
-      btn.textContent = 'Verifying...';
+      btn.textContent = 'Verifying Profile...';
+      alertBanner.style.display = 'none';
 
       try {
         const response = await fetch('/api/auth/signin', {
@@ -189,52 +278,19 @@
         const result = await response.json();
         
         if (response.ok) {
-          showAlert(true, `✓ Access granted! Welcome back, ${result.user.username}. Entering website...`);
-          
-          // Triggers redirection back to your main website layout home index after 1.5 seconds
+          displayMessage(true, `✓ Log In verified! Welcome, ${result.user.username}. Accessing website...`);
+          // Redirect to index page home route after 1.5 seconds
           setTimeout(() => {
             window.location.href = '/';
           }, 1500);
-          
-        } else { throw new Error(result.error || 'Invalid credentials.'); }
-      } catch (err) { 
-        showAlert(false, `✗ Error: ${err.message}`); 
+        } else {
+          throw new Error(result.error || 'Identity matching query failed.');
+        }
+      } catch (err) {
+        displayMessage(false, `✗ Log In Error: ${err.message}`);
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Sign In';
-      }
-    });
-
-    // 3. FORGOT PASSWORD SUBMISSION ENGINE
-    document.getElementById('forgotForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('forgotEmail').value;
-      const newPassword = document.getElementById('forgotNewPassword').value;
-      const btn = document.getElementById('forgotBtn');
-
-      btn.disabled = true;
-      btn.textContent = 'Modifying records...';
-
-      try {
-        const response = await fetch('/api/auth/forgot', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, newPassword })
-        });
-        const result = await response.json();
-        
-        if (response.ok) {
-          showAlert(true, "✓ Password overwritten in database! Redirecting to login...");
-          document.getElementById('forgotForm').reset();
-          setTimeout(() => {
-            switchTab('signin');
-          }, 2000);
-        } else { throw new Error(result.error || 'Unable to update password.'); }
-      } catch (err) { 
-        showAlert(false, `✗ Error: ${err.message}`); 
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Update Password';
+        btn.textContent = 'Log In';
       }
     });
   </script>

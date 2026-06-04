@@ -1,43 +1,86 @@
 const express = require('express');
 const cors = require('cors');
+const { Pool } = require('pg');
+path = require('path');
 require('dotenv').config();
 
 const app = express();
 
 // Middleware
-app.use(cors());                  // Allows your frontend to connect to this API
-app.use(express.json());          // Allows your server to accept and read JSON data
+app.use(cors());
+app.use(express.json());
 
-// Test/Root Route
+// SERVE FRONTEND: This tells Express to serve your HTML, CSS, and images straight out of your folder
+app.use(express.static(__dirname));
+
+// Database Connection Configuration (Connecting to your Neon Console DB)
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false // Required for secure serverless connections to Neon SQL
+    }
+});
+
+// Automatically initialize your SQL table on startup if it doesn't exist
+const initDB = async () => {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS messages (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(100) NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+        console.log("Neon SQL database initialized successfully.");
+    } catch (err) {
+        console.error("Error initializing SQL database:", err);
+    }
+};
+initDB();
+
+// ROOT ROUTE: Serves your actual styled portfolio website instead of raw text
 app.get('/', (req, res) => {
-    res.json({ message: "Welcome to the Joytech Portfolio API! Server is up and running." });
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Example Route: Get Portfolio Projects
-app.get('/api/projects', (req, res) => {
-    const projects = [
-        { id: 1, title: "Project One", description: "A cool web app", tech: ["React", "Node"] },
-        { id: 2, title: "Project Two", description: "Another awesome project", tech: ["Python", "Flask"] }
-    ];
-    res.json(projects);
-});
-
-// Example Route: Handle Contact Form Submissions
-app.post('/api/contact', (req, res) => {
+// API ROUTE: Handle Contact Form Submissions and save them to Neon SQL
+app.post('/api/contact', async (req, res) => {
     const { name, email, message } = req.body;
     
     if (!name || !email || !message) {
         return res.status(400).json({ error: "Please provide name, email, and a message." });
     }
 
-    console.log(`Received message from ${name} (${email}): ${message}`);
-    
-    // In the future, you can save this to a database or send an email here!
-    res.json({ success: true, message: "Thank you for reaching out! Message received." });
+    try {
+        const queryText = 'INSERT INTO messages(name, email, message) VALUES($1, $2, $3) RETURNING *';
+        const values = [name, email, message];
+        const result = await pool.query(queryText, values);
+        
+        res.status(201).json({ 
+            success: true, 
+            message: "Message saved to Neon SQL successfully!",
+            data: result.rows[0] 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Database error. Could not save message." });
+    }
 });
 
-// Render dynamically assigns a port via process.env.PORT. 
-// 0.0.0.0 allows it to accept external connections.
+// API ROUTE: Securely retrieve messages from your dashboard
+app.get('/api/messages', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM messages ORDER BY created_at DESC');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Database error. Could not fetch messages." });
+    }
+});
+
+// Set port for deployment
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running successfully on port ${PORT}`);

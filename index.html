@@ -6,7 +6,7 @@
   <title>JoyTech Portfolio</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2=family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css">
 </head>
@@ -123,46 +123,42 @@
       </div>
 
       <div class="form-container">
-        <div data-fs-success class="form-alert success-message" style="display: none;">
-          ✓ Message sent successfully! I'll get back to you shortly.
+        <div id="successAlert" class="form-alert success-message" style="display: none;">
+          ✓ Message sent successfully! Stored securely in the Neon SQL Database.
         </div>
-        <div data-fs-error class="form-alert error-message" style="display: none;">
-          ✗ Failed to send. Please verify details and try again.
+        <div id="errorAlert" class="form-alert error-message" style="display: none;">
+          ✗ Failed to send. Please check your connectivity and try again.
         </div>
 
-        <form id="contact-form" class="custom-form" action="https://formspree.io/f/xjgledbb" method="POST">
+        <form id="contact-form" class="custom-form">
           <div class="form-row">
             <div class="form-group">
               <label for="name">Your Name</label>
-              <input type="text" id="name" name="name" placeholder="John Doe" required data-fs-field aria-describedby="name-error" />
-              <span id="name-error" data-fs-error="name" class="field-error"></span>
+              <input type="text" id="name" placeholder="John Doe" required />
             </div>
             <div class="form-group">
               <label for="email">Email Address</label>
-              <input type="email" id="email" name="email" placeholder="client@example.com" required data-fs-field aria-describedby="email-error" />
-              <span id="email-error" data-fs-error="email" class="field-error"></span>
+              <input type="email" id="email" placeholder="client@example.com" required />
             </div>
           </div>
 
           <div class="form-group">
             <label for="service">Requested Domain / Service</label>
-            <select id="service" name="service" required data-fs-field aria-describedby="service-error">
+            <select id="service" required>
               <option value="" disabled selected>Select an operational domain...</option>
               <option value="mobile_app">Mobile App</option>
               <option value="responsive_websites">Responsive Websites</option>
               <option value="posters">Posters</option>
               <option value="flyers">Flyers</option>
             </select>
-            <span id="service-error" data-fs-error="service" class="field-error"></span>
           </div>
 
           <div class="form-group">
             <label for="message">Detailed Scope & Requirements</label>
-            <textarea id="message" name="message" placeholder="Outline specific technical requirements, design themes, or project timelines..." required data-fs-field aria-describedby="message-error"></textarea>
-            <span id="message-error" data-fs-error="message" class="field-error"></span>
+            <textarea id="message" placeholder="Outline specific technical requirements, design themes, or project timelines..." required></textarea>
           </div>
 
-          <button type="submit" class="btn-submit" data-fs-submit-btn>Send Message</button>
+          <button type="submit" class="btn-submit">Send Message</button>
         </form>
       </div>
 
@@ -178,6 +174,76 @@
     <p>© 2026 JoyTech Portfolio | Designed by Joyce William</p>
   </footer>
 
-  <script src="script.js"></script>
+  <script>
+    // 1. HAMBURGER SLIDE ANIMATION LOGIC
+    const menuToggle = document.querySelector('.menu-toggle');
+    const mainNav = document.getElementById('main-navigation');
+    const navLinks = document.querySelectorAll('#main-navigation a');
+
+    menuToggle.addEventListener('click', () => {
+      menuToggle.classList.toggle('active');
+      mainNav.classList.toggle('active');
+    });
+
+    // Auto-closes the slide drawer when clicking any anchor link item
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        menuToggle.classList.remove('active');
+        mainNav.classList.remove('active');
+      });
+    });
+
+    // 2. LIVE NEON SQL DATABASE FORM PIPELINE
+    const contactForm = document.getElementById('contact-form');
+    const successAlert = document.getElementById('successAlert');
+    const errorAlert = document.getElementById('errorAlert');
+    const submitBtn = document.querySelector('.btn-submit');
+
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Retrieve text input values
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const service = document.getElementById('service').value;
+      const messageText = document.getElementById('message').value;
+
+      // Combine layout choice and notes into a unified message parameter for your database structure
+      const message = `[Service: ${service}] ${messageText}`;
+
+      // Visual loading state transitions
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+      successAlert.style.display = 'none';
+      errorAlert.style.display = 'none';
+
+      try {
+        // Direct internal post query to your active server architecture
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, email, message })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          successAlert.style.display = 'block';
+          contactForm.reset();
+        } else {
+          throw new Error(result.error || 'Database transaction error.');
+        }
+      } catch (err) {
+        console.error('Submission processing error:', err);
+        errorAlert.textContent = `✗ Error: ${err.message || 'Unable to sync with database service.'}`;
+        errorAlert.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Message';
+      }
+    });
+  </script>
 </body>
 </html>

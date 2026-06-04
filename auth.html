@@ -3,294 +3,166 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JoyTech - Authentication Portal</title>
+  <title>JoyTech - Website Portal Lock</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Direct Layout Integration matching your Deep Blue, Emerald Green & Gold theme */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    body {
-      background-color: #0b1329;
-      color: #f1f5f9;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
-    }
-
-    .portal-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .portal-header h1 {
-      color: #fbbf24; /* Gold Brand Logo Accent */
-      font-size: 28px;
-      margin-bottom: 5px;
-    }
-
-    .portal-header p {
-      color: #94a3b8;
-      font-size: 14px;
-    }
-
-    /* Dual Grid Box to show both inputs simultaneously */
-    .portal-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 30px;
-      width: 100%;
-      max-width: 900px;
-    }
-
-    .auth-card {
-      background-color: #111c3a;
-      border: 1px solid #1d4ed8; /* Deep Royal Blue Border */
-      border-radius: 12px;
-      padding: 35px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-    }
-
-    .card-title {
-      font-size: 22px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: #ffffff;
-      border-bottom: 2px solid #1d4ed8;
-      padding-bottom: 8px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      font-size: 14px;
-      color: #94a3b8;
-    }
-
-    .form-group input {
-      background: #0b1329;
-      border: 1px solid #1d4ed8;
-      padding: 12px;
-      border-radius: 6px;
-      color: #ffffff;
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-
-    .form-group input:focus {
-      border-color: #fbbf24; /* Gold glow on select */
-    }
-
-    .btn-action {
-      background-color: #1d4ed8;
-      color: #ffffff;
-      border: none;
-      padding: 12px;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 16px;
-      cursor: pointer;
-      width: 100%;
-      transition: all 0.3s ease;
-      margin-top: 5px;
-    }
-
-    .btn-action:hover {
-      background-color: #fbbf24;
-      color: #0b1329;
-    }
-
-    /* Alert Banner Classes */
-    .status-alert {
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 14px;
-      margin-bottom: 20px;
-      font-weight: 500;
-      text-align: center;
-      display: none;
-      width: 100%;
-      max-width: 900px;
-    }
-
-    .success {
-      background: rgba(4, 120, 87, 0.15); /* Emerald Green Translucent */
-      color: #10b981;
-      border: 1px solid #047857;
-    }
-
-    .error {
-      background: rgba(239, 68, 68, 0.1);
-      color: #ef4444;
-      border: 1px solid #ef4444;
-    }
-
-    .back-home {
-      margin-top: 30px;
-      color: #94a3b8;
-      text-decoration: none;
-      font-size: 14px;
-      transition: color 0.3s;
-    }
-
-    .back-home:hover {
-      color: #fbbf24;
-    }
-
-    /* Responsive adjustment for phones */
-    @media (max-width: 768px) {
-      .portal-grid {
-        grid-template-columns: 1fr;
-        gap: 25px;
-      }
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { background-color: #0b1329; color: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    
+    .lock-container { width: 100%; max-width: 450px; background-color: #111c3a; border-radius: 12px; padding: 40px 35px; border-top: 4px solid #1d4ed8; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+    .lock-header { text-align: center; margin-bottom: 30px; }
+    .lock-header h1 { color: #fbbf24; font-size: 26px; font-weight: 700; margin-bottom: 5px; }
+    .lock-header p { color: #94a3b8; font-size: 14px; }
+    
+    .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .form-group label { font-size: 14px; color: #94a3b8; }
+    .form-group input { background: #0b1329; border: 1px solid #1d4ed8; padding: 12px; border-radius: 6px; color: #ffffff; font-size: 15px; outline: none; }
+    .form-group input:focus { border-color: #fbbf24; }
+    
+    .btn-lock { background-color: #1d4ed8; color: #ffffff; border: none; padding: 12px; border-radius: 6px; font-weight: 600; font-size: 16px; cursor: pointer; width: 100%; transition: all 0.3s; }
+    .btn-lock:hover { background-color: #fbbf24; color: #0b1329; }
+    
+    .panel-toggle { text-align: center; margin-top: 20px; font-size: 14px; color: #94a3b8; }
+    .panel-toggle span { color: #fbbf24; cursor: pointer; text-decoration: underline; }
+    
+    .hidden-panel { display: none !important; }
+    .status-banner { padding: 12px; border-radius: 6px; font-size: 14px; margin-bottom: 20px; font-weight: 500; text-align: center; display: none; }
+    .success { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; }
+    .error { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
   </style>
 </head>
 <body>
 
-  <div class="portal-header">
-    <h1>JoyTech Gateways</h1>
-    <p>Sign in to your active portal or fill the form details to deploy a new profile account instantly.</p>
-  </div>
-
-  <div id="portalAlert" class="status-alert"></div>
-
-  <div class="portal-grid">
-    
-    <div class="auth-card">
-      <div class="card-title">Sign In / Login</div>
-      <form id="signinForm">
-        <div class="form-group">
-          <label for="signinUser">Username or Email</label>
-          <input type="text" id="signinUser" placeholder="Enter username or email" required />
-        </div>
-        <div class="form-group">
-          <label for="signinPassword">Password</label>
-          <input type="password" id="signinPassword" placeholder="••••••••" required />
-        </div>
-        <button type="submit" id="signinBtn" class="btn-action">Log In</button>
-      </form>
+  <div class="lock-container">
+    <div class="lock-header">
+      <h1>JoyTech Portal</h1>
+      <p id="lockDesc">Create an account to unlock the website</p>
     </div>
 
-    <div class="auth-card">
-      <div class="card-title">Create Account / Sign Up</div>
+    <div id="notifier" class="status-banner"></div>
+
+    <!-- STEP 1: SIGN UP FORM (SHOWN FIRST) -->
+    <div id="signupStep">
       <form id="signupForm">
         <div class="form-group">
-          <label for="signupUsername">Username</label>
-          <input type="text" id="signupUsername" placeholder="Create username" required />
+          <label>Username</label>
+          <input type="text" id="regUser" placeholder="Choose a username" required />
         </div>
         <div class="form-group">
-          <label for="signupEmail">Email Address</label>
-          <input type="email" id="signupEmail" placeholder="client@example.com" required />
+          <label>Email Address</label>
+          <input type="email" id="regEmail" placeholder="name@example.com" required />
         </div>
         <div class="form-group">
-          <label for="signupPassword">Password</label>
-          <input type="password" id="signupPassword" placeholder="••••••••" required />
+          <label>Password</label>
+          <input type="password" id="regPass" placeholder="••••••••" required />
         </div>
-        <button type="submit" id="signupBtn" class="btn-action">Register Profile</button>
+        <button type="submit" class="btn-lock">Step 1: Create Account</button>
       </form>
+      <div class="panel-toggle">Already have an account? <span onclick="showLogin()">Log In</span></div>
     </div>
 
+    <!-- STEP 2: LOGIN FORM (HIDDEN UNTIL SIGNUP IS DONE) -->
+    <div id="loginStep" class="hidden-panel">
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Username or Email</label>
+          <input type="text" id="logUser" placeholder="Enter username or email" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="logPass" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn-lock">Step 2: Unlock Website</button>
+      </form>
+      <div class="panel-toggle">Need an account? <span onclick="showSignup()">Sign Up</span></div>
+    </div>
   </div>
 
-  <a href="/" class="back-home">← Return to Main Portfolio Website</a>
-
   <script>
-    const alertBanner = document.getElementById('portalAlert');
+    const notifier = document.getElementById('notifier');
+    const signupStep = document.getElementById('signupStep');
+    const loginStep = document.getElementById('loginStep');
+    const lockDesc = document.getElementById('lockDesc');
 
-    function displayMessage(isSuccess, messageText) {
-      alertBanner.textContent = messageText;
-      alertBanner.style.display = 'block';
-      if (isSuccess) {
-        alertBanner.className = 'status-alert success';
-      } else {
-        alertBanner.className = 'status-alert error';
-      }
-      // Scroll to view the notification cleanly
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    function showLogin() {
+      signupStep.classList.add('hidden-panel');
+      loginStep.classList.remove('hidden-panel');
+      lockDesc.textContent = "Log in to verify identity";
+      notifier.style.display = 'none';
     }
 
-    // 1. SIGN UP DISPATCH HANDLER (Flashes notice upon completion)
+    function showSignup() {
+      loginStep.classList.add('hidden-panel');
+      signupStep.classList.remove('hidden-panel');
+      lockDesc.textContent = "Create an account to unlock the website";
+      notifier.style.display = 'none';
+    }
+
+    // 1. Handle Account Creation -> Directs cleanly to Login step
     document.getElementById('signupForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const username = document.getElementById('signupUsername').value;
-      const email = document.getElementById('signupEmail').value;
-      const password = document.getElementById('signupPassword').value;
-      const btn = document.getElementById('signupBtn');
-
-      btn.disabled = true;
-      btn.textContent = 'Registering Account...';
-      alertBanner.style.display = 'none';
+      notifier.style.display = 'none';
 
       try {
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, email, password })
+          body: JSON.stringify({
+            username: document.getElementById('regUser').value,
+            email: document.getElementById('regEmail').value,
+            password: document.getElementById('regPass').value
+          })
         });
         const result = await response.json();
-        
+
         if (response.ok) {
-          document.getElementById('signupForm').reset();
-          displayMessage(true, "✓ Sign Up complete! Account added to Neon database. Please use the left column form to log in.");
+          notifier.textContent = "✓ Account created successfully! Proceed to login.";
+          notifier.className = "status-banner success";
+          notifier.style.display = "block";
+          
+          // Instantly switch out forms to the log in step
+          setTimeout(() => { showLogin(); }, 1500);
         } else {
-          throw new Error(result.error || 'Account generation fault.');
+          throw new Error(result.error);
         }
       } catch (err) {
-        displayMessage(false, `✗ Sign Up Error: ${err.message}`);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Register Profile';
+        notifier.textContent = `✗ ${err.message}`;
+        notifier.className = "status-banner error";
+        notifier.style.display = "block";
       }
     });
 
-    // 2. SIGN IN DISPATCH HANDLER (Redirects to Portfolio Root Website)
-    document.getElementById('signinForm').addEventListener('submit', async (e) => {
+    // 2. Handle Login Verification -> Redirects straight into your website
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const userKey = document.getElementById('signinUser').value;
-      const password = document.getElementById('signinPassword').value;
-      const btn = document.getElementById('signinBtn');
-
-      btn.disabled = true;
-      btn.textContent = 'Verifying Profile...';
-      alertBanner.style.display = 'none';
+      notifier.style.display = 'none';
 
       try {
         const response = await fetch('/api/auth/signin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userKey, password })
+          body: JSON.stringify({
+            userKey: document.getElementById('logUser').value,
+            password: document.getElementById('logPass').value
+          })
         });
         const result = await response.json();
-        
+
         if (response.ok) {
-          displayMessage(true, `✓ Log In verified! Welcome, ${result.user.username}. Accessing website...`);
-          // Redirect to index page home route after 1.5 seconds
-          setTimeout(() => {
-            window.location.href = '/';
-          }, 1500);
+          notifier.textContent = "✓ Access granted! Unlocking website...";
+          notifier.className = "status-banner success";
+          notifier.style.display = "block";
+
+          // Directs user to the now hidden portfolio segment
+          setTimeout(() => { window.location.href = '/dashboard'; }, 1200);
         } else {
-          throw new Error(result.error || 'Identity matching query failed.');
+          throw new Error(result.error);
         }
       } catch (err) {
-        displayMessage(false, `✗ Log In Error: ${err.message}`);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Log In';
+        notifier.textContent = `✗ ${err.message}`;
+        notifier.className = "status-banner error";
+        notifier.style.display = "block";
       }
     });
   </script>

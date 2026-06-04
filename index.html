@@ -27,7 +27,6 @@
       <a href="#skills">Skills</a>
       <a href="#projects">Projects</a>
       <a href="#contact">Contact</a>
-      <a href="/auth" class="nav-portal-btn">Sign In</a>
     </nav>
   </header>
 
@@ -176,7 +175,7 @@
   </footer>
 
   <script>
-    // 1. MOBILE MENU DRAWER CONTROLS
+    // 1. MOBILE RESPONSIVE NAVIGATION CONTROL
     const menuToggle = document.querySelector('.menu-toggle');
     const mainNav = document.getElementById('main-navigation');
     const navLinks = document.querySelectorAll('#main-navigation a');
@@ -186,6 +185,7 @@
       mainNav.classList.toggle('active');
     });
 
+    // Auto-closes sidebar drawer panel when user clicks an option link
     navLinks.forEach(link => {
       link.addEventListener('click', () => {
         menuToggle.classList.remove('active');
@@ -193,7 +193,7 @@
       });
     });
 
-    // 2. LIVE CONTACT TRANSACTION SCRIPT
+    // 2. CONTACT DATA BACKEND TRANSFERS
     const contactForm = document.getElementById('contact-form');
     const successAlert = document.getElementById('successAlert');
     const errorAlert = document.getElementById('errorAlert');
@@ -207,8 +207,10 @@
       const service = document.getElementById('service').value;
       const messageText = document.getElementById('message').value;
 
+      // Unifies layout selection tags with raw input strings inside database
       const message = `[Service: ${service}] ${messageText}`;
 
+      // Loading state setups
       submitBtn.disabled = true;
       submitBtn.textContent = 'Sending...';
       successAlert.style.display = 'none';
@@ -232,8 +234,8 @@
           throw new Error(result.error || 'Server processing error.');
         }
       } catch (err) {
-        console.error(err);
-        errorAlert.textContent = `✗ Error: ${err.message || 'Unable to communicate with server.'}`;
+        console.error('Submission handling trace:', err);
+        errorAlert.textContent = `✗ Error: ${err.message || 'Unable to sync with your website server.'}`;
         errorAlert.style.display = 'block';
       } finally {
         submitBtn.disabled = false;

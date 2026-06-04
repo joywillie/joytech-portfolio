@@ -1,253 +1,507 @@
-/* ==========================================
-   1. RESET & BASE STYLES
-   ========================================== */
+/* ==========================================================================
+   1. GLOBAL RESETS & THEME DEFINITIONS
+   ========================================================================== */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-:root {
-    --bg-color: #0c1322;         /* Deep dark blue background */
-    --card-bg: #162238;          /* Lighter navy for cards */
-    --accent-blue: #38bdf8;     /* Bright responsive blue */
-    --text-main: #ffffff;        /* White text */
-    --text-muted: #94a3b8;       /* Grayish muted text */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
 html {
-    scroll-behavior: smooth;     /* Makes hamburger links slide smoothly */
-    background-color: var(--bg-color);
-    color: var(--text-main);
+  scroll-behavior: smooth;
 }
 
 body {
-    min-height: 100vh;
-    line-height: 1.6;
-    overflow-x: hidden;          /* Prevents unwanted side-scrolling due to hidden side menu */
+  background: #0f172a;
+  color: white;
+  padding-top: 73px; /* Prevents hero content from hiding behind fixed header */
 }
 
-/* ==========================================
-   2. NAVBAR & HEADER
-   ========================================== */
+/* ==========================================================================
+   2. NAVIGATION HEADER & GLOBAL HAMBURGER DRAWER
+   ========================================================================== */
 header {
-    background-color: #090e1a;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    border-bottom: 1px solid #1e293b;
-}
-
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1.2rem 2rem;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 8%;
+  background: #111827;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid #1e293b;
 }
 
 .logo {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--accent-blue);
-    text-decoration: none;
+  font-size: 28px;
+  font-weight: 700;
+  color: #38bdf8;
 }
 
-.nav-links {
-    display: flex;
-    list-style: none;
-    gap: 2rem;
+/* Force the hamburger icon button to show on ALL screens */
+.menu-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 5px;
+  z-index: 1100;
 }
 
-.nav-links a {
-    color: var(--text-main);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
+.menu-toggle span {
+  display: block;
+  width: 30px;
+  height: 3px;
+  background-color: white;
+  border-radius: 3px;
+  transition: 0.3s ease-in-out;
 }
 
-.nav-links a:hover {
-    color: var(--accent-blue);
+/* Animated Hamburger Morphing into an 'X' symbol when clicked */
+.menu-toggle.active span:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+  background-color: #38bdf8;
 }
 
-/* Hamburger Menu Icon */
-.hamburger {
-    display: none;
-    cursor: pointer;
-    background: none;
-    border: none;
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
 }
 
-.hamburger .bar {
-    display: block;
-    width: 28px;
-    height: 3px;
-    margin: 5px auto;
-    background-color: var(--text-main);
-    transition: all 0.3s ease-in-out;
+.menu-toggle.active span:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+  background-color: #38bdf8;
 }
 
-/* ==========================================
-   3. SECTION LAYOUTS
-   ========================================== */
+/* Navigation Overlay Menu Panel (Hidden off-screen on the left by default) */
+nav {
+  position: fixed;
+  top: 73px;
+  left: -100%;
+  width: 100%;
+  height: calc(100vh - 73px);
+  background: #111827;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 50px;
+  gap: 30px;
+  transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+  border-top: 1px solid #1e293b;
+  display: flex;
+}
+
+/* Slides the drawer menu out when the active class token is attached by JS */
+nav.active {
+  left: 0;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 22px;
+  width: 100%;
+  text-align: center;
+  padding: 10px 0;
+  transition: 0.3s;
+}
+
+nav a:hover {
+  color: #38bdf8;
+}
+
+/* ==========================================================================
+   3. HERO SECTION
+   ========================================================================== */
+.hero {
+  min-height: calc(100vh - 73px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 60px 8%;
+  gap: 40px;
+}
+
+.hero-text {
+  flex: 1;
+}
+
+.hero-text h3 {
+  font-size: 25px;
+  margin-bottom: 10px;
+}
+
+.hero-text h1 {
+  font-size: 65px;
+  color: #38bdf8;
+  line-height: 1.1;
+}
+
+.hero-text h2 {
+  font-size: 32px;
+  margin: 15px 0;
+  color: #e2e8f0;
+}
+
+.hero-text p {
+  margin: 20px 0;
+  line-height: 1.8;
+  max-width: 600px;
+  color: #cbd5e1;
+}
+
+.buttons {
+  margin-top: 30px;
+}
+
+.btn {
+  background: #38bdf8;
+  color: black;
+  padding: 14px 28px;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-right: 15px;
+  transition: 0.3s;
+  display: inline-block;
+}
+
+.btn:hover {
+  background: white;
+}
+
+.btn-outline {
+  border: 2px solid #38bdf8;
+  color: #38bdf8;
+  padding: 12px 28px;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: 0.3s;
+  display: inline-block;
+}
+
+.btn-outline:hover {
+  background: #38bdf8;
+  color: black;
+}
+
+.hero-image img {
+  width: 350px;
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+}
+
+/* ==========================================================================
+   4. SECTIONS COMMON LAYOUT
+   ========================================================================== */
 section {
-    padding: 6rem 2rem 4rem 2rem; /* Clear fixed navbar space */
-    max-width: 1200px;
-    margin: 0 auto;
-    min-height: 80vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  padding: 100px 8%;
 }
 
 .section-title {
-    font-size: 2.5rem;
-    color: var(--accent-blue);
-    text-align: center;
-    margin-bottom: 3rem;
+  margin-bottom: 50px;
+  text-align: center;
 }
 
-/* ==========================================
-   4. PROJECTS GRID (Cards)
-   ========================================== */
-.projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2.5rem;
+.section-title h2 {
+  font-size: 42px;
+  color: #38bdf8;
+}
+
+/* ABOUT SECTION */
+.about p {
+  max-width: 900px;
+  margin: auto;
+  text-align: center;
+  line-height: 2;
+  color: #cbd5e1;
+  font-size: 18px;
+}
+
+/* ==========================================================================
+   5. SKILLS GRID
+   ========================================================================== */
+.skills-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 25px;
+}
+
+.skill-card {
+  background: #1e293b;
+  padding: 35px;
+  border-radius: 15px;
+  text-align: center;
+  transition: 0.3s;
+  border: 1px solid transparent;
+}
+
+.skill-card:hover {
+  transform: translateY(-10px);
+  border-color: #38bdf8;
+}
+
+.skill-card h3 {
+  font-size: 22px;
+}
+
+/* ==========================================================================
+   6. PROJECTS GRID
+   ========================================================================== */
+.project-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
 }
 
 .project-card {
-    background-color: var(--card-bg);
-    border-radius: 12px;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid #22324d;
+  background: #1e293b;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: 0.3s;
 }
 
 .project-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-10px);
 }
 
-.project-image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    background-color: #1e293b; /* Placeholder color if image fails */
+.project-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
 }
 
-.project-content {
-    padding: 1.5rem;
+.project-card h3 {
+  padding: 20px 20px 10px;
+  color: #38bdf8;
 }
 
-.project-content h3 {
-    font-size: 1.4rem;
-    margin-bottom: 0.5rem;
-    color: var(--accent-blue);
+.project-card p {
+  padding: 0 20px 25px;
+  color: #cbd5e1;
 }
 
-.project-content p {
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    margin-bottom: 1rem;
+/* ==========================================================================
+   7. CONTACT WRAPPER & RESPONSIVE FORM
+   ========================================================================== */
+.contact-wrapper {
+  max-width: 950px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 40px;
 }
 
-/* ==========================================
-   5. CONTACT FORM
-   ========================================== */
-.contact-container {
-    max-width: 600px;
-    margin: 0 auto;
-    width: 100%;
-    background-color: var(--card-bg);
-    padding: 2.5rem;
-    border-radius: 12px;
-    border: 1px solid #22324d;
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-item {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  border-left: 4px solid #38bdf8;
+}
+
+.info-item h4 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #38bdf8;
+  margin-bottom: 5px;
+}
+
+.info-item a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.info-item a:hover {
+  color: #38bdf8;
+}
+
+.form-container {
+  width: 100%;
+}
+
+.custom-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-row .form-group {
+  flex: 1;
 }
 
 .form-group {
-    margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--text-muted);
-    font-size: 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #94a3b8;
 }
 
 .form-group input,
+.form-group select,
 .form-group textarea {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    background-color: var(--bg-color);
-    border: 1px solid #22324d;
-    border-radius: 6px;
-    color: var(--text-main);
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 10px;
+  background: #1e293b;
+  color: white;
+  font-size: 16px;
+  transition: box-shadow 0.15s ease-in-out;
 }
 
 .form-group input:focus,
+.form-group select:focus,
 .form-group textarea:focus {
-    outline: none;
-    border-color: var(--accent-blue);
+  outline: none;
+  box-shadow: 0 0 0 2px #38bdf8;
 }
 
-.submit-btn {
-    width: 100%;
-    padding: 1rem;
-    background-color: var(--accent-blue);
-    color: #000000;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.3s ease;
+.form-group select {
+  cursor: pointer;
 }
 
-.submit-btn:hover {
-    opacity: 0.9;
+.form-group textarea {
+  height: 180px;
+  resize: none;
 }
 
-/* ==========================================
-   6. RESPONSIVE SIDEBAR DRAWER LAYOUT
-   ========================================== */
-@media (max-width: 768px) {
-    .hamburger {
-        display: block;   /* Show hamburger on mobile screens */
-        z-index: 1001;    /* Keeps icon on top of the side drawer */
-    }
+/* Formspree Validation Engine States */
+.form-group [aria-invalid="true"] {
+  box-shadow: 0 0 0 2px #ef4444 !important;
+}
 
-    /* Transforms navigation overlay into a modern side drawer panel */
-    .nav-links {
-        position: fixed;
-        right: -100%;       /* Off-screen to the right by default */
-        left: auto;         /* Clears default layouts */
-        top: 0;
-        flex-direction: column;
-        background-color: rgba(9, 14, 26, 0.95); /* Semi-transparent dark overlay */
-        backdrop-filter: blur(8px);               /* Blurs homepage visible under menu */
-        width: 260px;       /* Custom sidebar width bounds */
-        height: 100vh;      /* Full viewport container height */
-        text-align: left;
-        padding: 6rem 2rem; /* Shifts links clear from fixed top layouts */
-        gap: 2rem;
-        transition: right 0.3s ease-in-out; /* Smooth slide out transaction */
-        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
-    }
+.field-error {
+  font-size: 0.8rem;
+  color: #ef4444;
+  margin-top: 2px;
+}
 
-    /* Triggered by your JavaScript menu click function */
-    .nav-links.active {
-        right: 0;           /* Slides right panel edge directly into view */
-    }
+.btn-submit {
+  background: #38bdf8;
+  color: black;
+  padding: 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
 
-    .section-title {
-        font-size: 2rem;
-    }
+.btn-submit:hover {
+  background: white;
+}
+
+.btn-submit:disabled {
+  background: #64748b;
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.form-alert {
+  padding: 16px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.success-message {
+  background-color: #065f46;
+  border: 1px solid #34d399;
+  color: #a7f3d0;
+}
+
+.error-message {
+  background-color: #991b1b;
+  border: 1px solid #f87171;
+  color: #fca5a5;
+}
+
+/* ==========================================================================
+   8. FOOTER
+   ========================================================================== */
+footer {
+  text-align: center;
+  padding: 40px 20px;
+  background: #111827;
+  color: #cbd5e1;
+}
+
+footer .footer-contacts {
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+footer .footer-contacts a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 10px;
+  transition: 0.3s;
+}
+
+footer .footer-contacts a:hover {
+  color: white;
+}
+
+/* ==========================================================================
+   9. MEDIA QUERIES (RESPONSIVE ALIGNMENTS FOR MOBILE & TABLETS)
+   ========================================================================== */
+@media(max-width: 900px) {
+  header {
+    padding: 20px 5%;
+  }
+
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    padding-top: 40px;
+    justify-content: center;
+  }
+
+  .hero-text h1 {
+    font-size: 45px;
+  }
+
+  .hero-text h2 {
+    font-size: 25px;
+  }
+
+  .hero-image img {
+    width: 280px;
+  }
+
+  .contact-wrapper {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 20px;
+  }
 }

@@ -16,6 +16,7 @@ body {
   background: #0f172a;
   color: white;
   padding-top: 73px; /* Prevents hero content from hiding behind fixed header */
+  overflow-x: hidden; /* Prevents horizontal scrollbars when menu is tucked away */
 }
 
 /* ==========================================================================
@@ -49,7 +50,7 @@ header {
   background: none;
   border: none;
   padding: 5px;
-  z-index: 1100;
+  z-index: 1100; /* Stays floating above the slide drawer */
 }
 
 .menu-toggle span {
@@ -76,27 +77,29 @@ header {
   background-color: #38bdf8;
 }
 
-/* Navigation Overlay Menu Panel (Hidden off-screen on the left by default) */
+/* Navigation Overlay Menu Panel (Styled as a clean right-side drawer panel) */
 nav {
   position: fixed;
-  top: 73px;
-  left: -100%;
-  width: 100%;
-  height: calc(100vh - 73px);
-  background: #111827;
+  top: 0;                             /* Spans from the very top of the screen */
+  right: -100%;                       /* Hidden safely off-screen to the right side */
+  left: auto;                         /* Overrides original left alignment properties */
+  width: 280px;                       /* Custom narrow width bounds so homepage stays visible */
+  height: 100vh;                      /* Full screen viewport container height */
+  background: rgba(17, 24, 39, 0.96); /* Dark base with fine opacity to peek at homepage */
+  backdrop-filter: blur(8px);        /* Softly blurs your project cards underneath the panel */
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 50px;
+  padding-top: 100px;                 /* Extra space so links clear the absolute header items */
   gap: 30px;
-  transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
-  border-top: 1px solid #1e293b;
+  transition: right 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); /* Premium fluid transition curve */
+  border-left: 1px solid #1e293b;     /* Structural panel divider line */
   display: flex;
 }
 
 /* Slides the drawer menu out when the active class token is attached by JS */
 nav.active {
-  left: 0;
+  right: 0;
 }
 
 nav a {
@@ -504,4 +507,4 @@ footer .footer-contacts a:hover {
     flex-direction: column;
     gap: 20px;
   }
-}
+}s

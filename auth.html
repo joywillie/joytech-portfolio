@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JoyTech - Portal Authentication</title>
+  <link href="https://fonts.googleapis.com/css2=family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Compact styling matching your official university/brand color scheme */
+    .auth-container {
+      max-width: 450px;
+      margin: 80px auto;
+      padding: 30px;
+      background: #111827;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      color: #fff;
+    }
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #1e293b;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: 500;
+      color: #94a3b8;
+    }
+    .auth-tab.active {
+      color: #38bdf8;
+      border-bottom: 2px solid #38bdf8;
+    }
+    .password-wrapper {
+      position: relative;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 38px;
+      cursor: pointer;
+      color: #94a3b8;
+      font-size: 14px;
+      user-select: none;
+    }
+    .auth-toggle-link {
+      color: #38bdf8;
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 14px;
+    }
+    .hidden-panel { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="auth-container">
+    <div id="authTabs" class="auth-tabs">
+      <div class="auth-tab active" onclick="switchTab('signin')">Sign In</div>
+      <div class="auth-tab" onclick="switchTab('signup')">Sign Up</div>
+    </div>
+
+    <div id="authSuccess" class="form-alert success-message" style="display: none; margin-bottom: 15px;"></div>
+    <div id="authError" class="form-alert error-message" style="display: none; margin-bottom: 15px;"></div>
+
+    <div id="signinPanel">
+      <form id="signinForm" class="custom-form">
+        <div class="form-group">
+          <label>Username or Email</label>
+          <input type="text" id="signinUser" placeholder="joytech_admin" required />
+        </div>
+        <div class="form-group password-wrapper">
+          <label>Password</label>
+          <input type="password" id="signinPassword" placeholder="••••••••" required />
+          <span class="toggle-password" onclick="togglePasswordVisibility('signinPassword')">👁️ Show</span>
+        </div>
+        <p style="text-align: right; margin-top: -5px;">
+          <span class="auth-toggle-link" onclick="switchTab('forgot')">Forgot Password?</span>
+        </p>
+        <button type="submit" class="btn-submit" style="width: 100%; margin-top: 15px;">Sign In</button>
+      </form>
+    </div>
+
+    <div id="signupPanel" class="hidden-panel">
+      <form id="signupForm" class="custom-form">
+        <div class="form-group">
+          <label>Preferred Username</label>
+          <input type="text" id="signupUsername" placeholder="joytech_dev" required />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="signupEmail" placeholder="developer@example.com" required />
+        </div>
+        <div class="form-group password-wrapper">
+          <label>Secure Password</label>
+          <input type="password" id="signupPassword" placeholder="••••••••" required />
+          <span class="toggle-password" onclick="togglePasswordVisibility('signupPassword')">👁️ Show</span>
+        </div>
+        <button type="submit" class="btn-submit" style="width: 100%; margin-top: 15px;">Create Account</button>
+      </form>
+    </div>
+
+    <div id="forgotPanel" class="hidden-panel">
+      <h3>Reset Password</h3>
+      <p style="font-size: 14px; color: #94a3b8; margin-bottom: 20px;">
+        Provide your registered email address. We'll simulate checking your credentials and update your database records.
+      </p>
+      <form id="forgotForm" class="custom-form">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="forgotEmail" placeholder="your-email@example.com" required />
+        </div>
+        <div class="form-group password-wrapper">
+          <label>New Password</label>
+          <input type="password" id="forgotNewPassword" placeholder="••••••••" required />
+          <span class="toggle-password" onclick="togglePasswordVisibility('forgotNewPassword')">👁️ Show</span>
+        </div>
+        <button type="submit" class="btn-submit" style="width: 100%; margin-top: 15px;">Update Password</button>
+        <p style="text-align: center; margin-top: 15px;">
+          <span class="auth-toggle-link" onclick="switchTab('signin')">Back to Sign In</span>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const successAlert = document.getElementById('authSuccess');
+    const errorAlert = document.getElementById('authError');
+
+    // UI Panel Switching Engine
+    function switchTab(mode) {
+      successAlert.style.display = 'none';
+      errorAlert.style.display = 'none';
+      
+      document.getElementById('signinPanel').classList.add('hidden-panel');
+      document.getElementById('signupPanel').classList.add('hidden-panel');
+      document.getElementById('forgotPanel').classList.add('hidden-panel');
+      document.getElementById('authTabs').style.display = 'flex';
+      
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+
+      if(mode === 'signin') {
+        document.getElementById('signinPanel').classList.remove('hidden-panel');
+        document.querySelectorAll('.auth-tab')[0].classList.add('active');
+      } else if(mode === 'signup') {
+        document.getElementById('signupPanel').classList.remove('hidden-panel');
+        document.querySelectorAll('.auth-tab')[1].classList.add('active');
+      } else if(mode === 'forgot') {
+        document.getElementById('forgotPanel').classList.remove('hidden-panel');
+        document.getElementById('authTabs').style.display = 'none';
+      }
+    }
+
+    // Dynamic Password Text Masking/Unmasking Toggle
+    function togglePasswordVisibility(fieldId) {
+      const passwordField = document.getElementById(fieldId);
+      const toggleBtn = passwordField.nextElementSibling;
+      if (passwordField.type === "password") {
+        passwordField.type = "text";
+        toggleBtn.textContent = "🙈 Hide";
+      } else {
+        passwordField.type = "password";
+        toggleBtn.textContent = "👁️ Show";
+      }
+    }
+
+    const showAlert = (isSuccess, text) => {
+      successAlert.style.display = isSuccess ? 'block' : 'none';
+      successAlert.textContent = text;
+      errorAlert.style.display = isSuccess ? 'none' : 'block';
+      errorAlert.textContent = text;
+    };
+
+    // FORM SUBMISSION EVENT HANDLERS
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('signupUsername').value;
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPassword').value;
+
+      try {
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password })
+        });
+        const result = await response.json();
+        if (response.ok) {
+          showAlert(true, "✓ Registration successful! Switch tabs to login.");
+          document.getElementById('signupForm').reset();
+        } else { throw new Error(result.error); }
+      } catch (err) { showAlert(false, `✗ Error: ${err.message}`); }
+    });
+
+    document.getElementById('signinForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userKey = document.getElementById('signinUser').value;
+      const password = document.getElementById('signinPassword').value;
+
+      try {
+        const response = await fetch('/api/auth/signin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userKey, password })
+        });
+        const result = await response.json();
+        if (response.ok) {
+          showAlert(true, `Welcome back, ${result.user.username}! Directing to internal dashboard...`);
+          // Optional redirect path: window.location.href = '/api/messages';
+        } else { throw new Error(result.error); }
+      } catch (err) { showAlert(false, `✗ Error: ${err.message}`); }
+    });
+
+    document.getElementById('forgotForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('forgotEmail').value;
+      const newPassword = document.getElementById('forgotNewPassword').value;
+
+      try {
+        const response = await fetch('/api/auth/forgot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, newPassword })
+        });
+        const result = await response.json();
+        if (response.ok) {
+          showAlert(true, "✓ Password modified successfully in the database rows!");
+          document.getElementById('forgotForm').reset();
+        } else { throw new Error(result.error); }
+      } catch (err) { showAlert(false, `✗ Error: ${err.message}`); }
+    });
+  </script>
+</body>
+</html>

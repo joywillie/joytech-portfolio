@@ -4,58 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JoyTech - Portal Authentication</title>
-  <link href="https://fonts.googleapis.com/css2=family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* Compact styling matching your official university/brand color scheme */
-    .auth-container {
-      max-width: 450px;
-      margin: 80px auto;
-      padding: 30px;
-      background: #111827;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-      color: #fff;
-    }
-    .auth-tabs {
-      display: flex;
-      margin-bottom: 25px;
-      border-bottom: 2px solid #1e293b;
-    }
-    .auth-tab {
-      flex: 1;
-      padding: 12px;
-      text-align: center;
-      cursor: pointer;
-      font-weight: 500;
-      color: #94a3b8;
-    }
-    .auth-tab.active {
-      color: #38bdf8;
-      border-bottom: 2px solid #38bdf8;
-    }
-    .password-wrapper {
-      position: relative;
-    }
-    .toggle-password {
-      position: absolute;
-      right: 15px;
-      top: 38px;
-      cursor: pointer;
-      color: #94a3b8;
-      font-size: 14px;
-      user-select: none;
-    }
-    .auth-toggle-link {
-      color: #38bdf8;
-      cursor: pointer;
-      text-decoration: underline;
-      font-size: 14px;
-    }
-    .hidden-panel { display: none; }
-  </style>
 </head>
-<body>
+<body style="background-color: #0b1329; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
 
   <div class="auth-container">
     <div id="authTabs" class="auth-tabs">
@@ -63,62 +16,62 @@
       <div class="auth-tab" onclick="switchTab('signup')">Sign Up</div>
     </div>
 
-    <div id="authSuccess" class="form-alert success-message" style="display: none; margin-bottom: 15px;"></div>
-    <div id="authError" class="form-alert error-message" style="display: none; margin-bottom: 15px;"></div>
+    <div id="authSuccess" class="form-alert success-message" style="display: none;"></div>
+    <div id="authError" class="form-alert error-message" style="display: none;"></div>
 
     <div id="signinPanel">
       <form id="signinForm" class="custom-form">
         <div class="form-group">
-          <label>Username or Email</label>
-          <input type="text" id="signinUser" placeholder="joytech_admin" required />
+          <label for="signinUser">Username or Email</label>
+          <input type="text" id="signinUser" placeholder="joytech_dev" required />
         </div>
         <div class="form-group password-wrapper">
-          <label>Password</label>
+          <label for="signinPassword">Password</label>
           <input type="password" id="signinPassword" placeholder="••••••••" required />
           <span class="toggle-password" onclick="togglePasswordVisibility('signinPassword')">👁️ Show</span>
         </div>
         <p style="text-align: right; margin-top: -5px;">
           <span class="auth-toggle-link" onclick="switchTab('forgot')">Forgot Password?</span>
         </p>
-        <button type="submit" class="btn-submit" style="width: 100%; margin-top: 15px;">Sign In</button>
+        <button type="submit" id="signinBtn" class="btn-submit" style="width: 100%; margin-top: 10px;">Sign In</button>
       </form>
     </div>
 
     <div id="signupPanel" class="hidden-panel">
       <form id="signupForm" class="custom-form">
         <div class="form-group">
-          <label>Preferred Username</label>
-          <input type="text" id="signupUsername" placeholder="joytech_dev" required />
+          <label for="signupUsername">Preferred Username</label>
+          <input type="text" id="signupUsername" placeholder="joytech_member" required />
         </div>
         <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" id="signupEmail" placeholder="developer@example.com" required />
+          <label for="signupEmail">Email Address</label>
+          <input type="email" id="signupEmail" placeholder="client@example.com" required />
         </div>
         <div class="form-group password-wrapper">
-          <label>Secure Password</label>
+          <label for="signupPassword">Secure Password</label>
           <input type="password" id="signupPassword" placeholder="••••••••" required />
           <span class="toggle-password" onclick="togglePasswordVisibility('signupPassword')">👁️ Show</span>
         </div>
-        <button type="submit" class="btn-submit" style="width: 100%; margin-top: 15px;">Create Account</button>
+        <button type="submit" id="signupBtn" class="btn-submit" style="width: 100%; margin-top: 10px;">Create Account</button>
       </form>
     </div>
 
     <div id="forgotPanel" class="hidden-panel">
-      <h3>Reset Password</h3>
-      <p style="font-size: 14px; color: #94a3b8; margin-bottom: 20px;">
-        Provide your registered email address. We'll simulate checking your credentials and update your database records.
+      <h3 style="margin-bottom: 10px; color: #ffffff; font-size: 20px;">Reset Password</h3>
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px;">
+        Provide your registered email address below to overwrite your account records inside the database safely.
       </p>
       <form id="forgotForm" class="custom-form">
         <div class="form-group">
-          <label>Email Address</label>
+          <label for="forgotEmail">Email Address</label>
           <input type="email" id="forgotEmail" placeholder="your-email@example.com" required />
         </div>
         <div class="form-group password-wrapper">
-          <label>New Password</label>
+          <label for="forgotNewPassword">New Password</label>
           <input type="password" id="forgotNewPassword" placeholder="••••••••" required />
           <span class="toggle-password" onclick="togglePasswordVisibility('forgotNewPassword')">👁️ Show</span>
         </div>
-        <button type="submit" class="btn-submit" style="width: 100%; margin-top: 15px;">Update Password</button>
+        <button type="submit" id="forgotBtn" class="btn-submit" style="width: 100%; margin-top: 10px;">Update Password</button>
         <p style="text-align: center; margin-top: 15px;">
           <span class="auth-toggle-link" onclick="switchTab('signin')">Back to Sign In</span>
         </p>
@@ -130,7 +83,7 @@
     const successAlert = document.getElementById('authSuccess');
     const errorAlert = document.getElementById('authError');
 
-    // UI Panel Switching Engine
+    // Tab Switching Machine Logic
     function switchTab(mode) {
       successAlert.style.display = 'none';
       errorAlert.style.display = 'none';
@@ -142,19 +95,19 @@
       
       document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
 
-      if(mode === 'signin') {
+      if (mode === 'signin') {
         document.getElementById('signinPanel').classList.remove('hidden-panel');
         document.querySelectorAll('.auth-tab')[0].classList.add('active');
-      } else if(mode === 'signup') {
+      } else if (mode === 'signup') {
         document.getElementById('signupPanel').classList.remove('hidden-panel');
         document.querySelectorAll('.auth-tab')[1].classList.add('active');
-      } else if(mode === 'forgot') {
+      } else if (mode === 'forgot') {
         document.getElementById('forgotPanel').classList.remove('hidden-panel');
         document.getElementById('authTabs').style.display = 'none';
       }
     }
 
-    // Dynamic Password Text Masking/Unmasking Toggle
+    // Dynamic Masking Utility Toggle (Show/Hide Text while typing)
     function togglePasswordVisibility(fieldId) {
       const passwordField = document.getElementById(fieldId);
       const toggleBtn = passwordField.nextElementSibling;
@@ -168,18 +121,27 @@
     }
 
     const showAlert = (isSuccess, text) => {
-      successAlert.style.display = isSuccess ? 'block' : 'none';
-      successAlert.textContent = text;
-      errorAlert.style.display = isSuccess ? 'none' : 'block';
-      errorAlert.textContent = text;
+      if (isSuccess) {
+        successAlert.style.display = 'block';
+        successAlert.textContent = text;
+        errorAlert.style.display = 'none';
+      } else {
+        errorAlert.style.display = 'block';
+        errorAlert.textContent = text;
+        successAlert.style.display = 'none';
+      }
     };
 
-    // FORM SUBMISSION EVENT HANDLERS
+    // 1. SIGN UP SUBMISSION ENGINE (Forwards to login page)
     document.getElementById('signupForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const username = document.getElementById('signupUsername').value;
       const email = document.getElementById('signupEmail').value;
       const password = document.getElementById('signupPassword').value;
+      const btn = document.getElementById('signupBtn');
+
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
 
       try {
         const response = await fetch('/api/auth/signup', {
@@ -188,17 +150,35 @@
           body: JSON.stringify({ username, email, password })
         });
         const result = await response.json();
+        
         if (response.ok) {
-          showAlert(true, "✓ Registration successful! Switch tabs to login.");
           document.getElementById('signupForm').reset();
-        } else { throw new Error(result.error); }
-      } catch (err) { showAlert(false, `✗ Error: ${err.message}`); }
+          showAlert(true, "✓ Registration successful! Sending you to Sign In screen...");
+          
+          // Smoothly shifts focus to the Sign In layout after 2 seconds
+          setTimeout(() => {
+            switchTab('signin');
+            showAlert(true, "Profile generated successfully! Use your new credentials to log in.");
+          }, 2000);
+          
+        } else { throw new Error(result.error || 'Registration failed.'); }
+      } catch (err) { 
+        showAlert(false, `✗ Error: ${err.message}`); 
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+      }
     });
 
+    // 2. SIGN IN SUBMISSION ENGINE (Forwards to main portfolio layout)
     document.getElementById('signinForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const userKey = document.getElementById('signinUser').value;
       const password = document.getElementById('signinPassword').value;
+      const btn = document.getElementById('signinBtn');
+
+      btn.disabled = true;
+      btn.textContent = 'Verifying...';
 
       try {
         const response = await fetch('/api/auth/signin', {
@@ -207,17 +187,33 @@
           body: JSON.stringify({ userKey, password })
         });
         const result = await response.json();
+        
         if (response.ok) {
-          showAlert(true, `Welcome back, ${result.user.username}! Directing to internal dashboard...`);
-          // Optional redirect path: window.location.href = '/api/messages';
-        } else { throw new Error(result.error); }
-      } catch (err) { showAlert(false, `✗ Error: ${err.message}`); }
+          showAlert(true, `✓ Access granted! Welcome back, ${result.user.username}. Entering website...`);
+          
+          // Triggers redirection back to your main website layout home index after 1.5 seconds
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1500);
+          
+        } else { throw new Error(result.error || 'Invalid credentials.'); }
+      } catch (err) { 
+        showAlert(false, `✗ Error: ${err.message}`); 
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
     });
 
+    // 3. FORGOT PASSWORD SUBMISSION ENGINE
     document.getElementById('forgotForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('forgotEmail').value;
       const newPassword = document.getElementById('forgotNewPassword').value;
+      const btn = document.getElementById('forgotBtn');
+
+      btn.disabled = true;
+      btn.textContent = 'Modifying records...';
 
       try {
         const response = await fetch('/api/auth/forgot', {
@@ -226,11 +222,20 @@
           body: JSON.stringify({ email, newPassword })
         });
         const result = await response.json();
+        
         if (response.ok) {
-          showAlert(true, "✓ Password modified successfully in the database rows!");
+          showAlert(true, "✓ Password overwritten in database! Redirecting to login...");
           document.getElementById('forgotForm').reset();
-        } else { throw new Error(result.error); }
-      } catch (err) { showAlert(false, `✗ Error: ${err.message}`); }
+          setTimeout(() => {
+            switchTab('signin');
+          }, 2000);
+        } else { throw new Error(result.error || 'Unable to update password.'); }
+      } catch (err) { 
+        showAlert(false, `✗ Error: ${err.message}`); 
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Update Password';
+      }
     });
   </script>
 </body>

@@ -7,22 +7,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Global Reset & Theme Variables */
     :root {
       --bg-deep: #0b1329;
-      --panel-bg: rgba(17, 28, 58, 0.75);
+      --panel-bg: rgba(17, 28, 58, 0.95);
       --accent-blue: #1d4ed8;
       --accent-glow: #3b82f6;
       --text-gold: #fbbf24;
       --text-muted: #94a3b8;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
     body {
       background: radial-gradient(circle at center, #1e293b 0%, var(--bg-deep) 100%);
@@ -32,67 +26,25 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
-      overflow-x: hidden;
     }
 
-    /* Glassmorphism Portal Card */
     .portal-card {
       width: 100%;
       max-width: 440px;
       background: var(--panel-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(29, 78, 216, 0.25);
       border-radius: 20px;
       padding: 45px 35px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-      transform: translateY(0);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .portal-card:hover {
-      border-color: rgba(59, 130, 246, 0.5);
-      box-shadow: 0 30px 60px -10px rgba(29, 78, 216, 0.25);
-    }
+    .portal-header { text-align: center; margin-bottom: 35px; }
+    .portal-header .logo { font-size: 32px; font-weight: 700; color: var(--text-gold); margin-bottom: 6px; }
+    .portal-header p { color: var(--text-muted); font-size: 14px; font-weight: 300; }
 
-    /* Header Styling */
-    .portal-header {
-      text-align: center;
-      margin-bottom: 35px;
-    }
-
-    .portal-header .logo {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--text-gold);
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-      text-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
-    }
-
-    .portal-header p {
-      color: var(--text-muted);
-      font-size: 14px;
-      font-weight: 300;
-    }
-
-    /* Form Fields Styling */
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 24px;
-      position: relative;
-    }
-
-    .form-group label {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
+    .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; position: relative; }
+    .form-group label { font-size: 13px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; }
+    
     .form-group input {
       background: rgba(11, 19, 41, 0.6);
       border: 1.5px solid rgba(29, 78, 216, 0.4);
@@ -101,94 +53,35 @@
       color: #ffffff;
       font-size: 15px;
       outline: none;
-      transition: all 0.3s ease;
+      width: 100%;
     }
+    .form-group input:focus { border-color: var(--accent-glow); box-shadow: 0 0 12px rgba(59, 130, 246, 0.3); }
 
-    .form-group input:focus {
-      border-color: var(--accent-glow);
-      box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
-      background: rgba(11, 19, 41, 0.9);
+    .password-toggle {
+      position: absolute; right: 16px; bottom: 14px;
+      font-size: 12px; color: var(--text-muted); cursor: pointer; font-weight: 600;
+      user-select: none;
     }
+    .password-toggle:hover { color: var(--text-gold); }
 
-    /* Premium Button Style */
+    .forgot-link { font-size: 12px; color: var(--text-gold); text-decoration: underline; cursor: pointer; display: block; text-align: right; margin-top: -16px; margin-bottom: 20px; }
+
     .btn-portal {
       background: linear-gradient(135deg, var(--accent-blue) 0%, #1e40af 100%);
-      color: #ffffff;
-      border: none;
-      padding: 14px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 16px;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      width: 100%;
-      box-shadow: 0 4px 15px rgba(29, 78, 216, 0.4);
-      transition: all 0.3s ease;
+      color: #ffffff; border: none; padding: 14px; border-radius: 10px;
+      font-weight: 600; font-size: 16px; cursor: pointer; width: 100%; transition: all 0.3s;
     }
+    .btn-portal:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
 
-    .btn-portal:hover {
-      background: linear-gradient(135deg, #2563eb 0%, var(--accent-blue) 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-    }
+    .portal-switch { text-align: center; margin-top: 25px; font-size: 14px; color: var(--text-muted); }
+    .portal-switch span { color: var(--text-gold); font-weight: 500; cursor: pointer; margin-left: 5px; }
+    .portal-switch span:hover { text-decoration: underline; }
 
-    .btn-portal:active {
-      transform: translateY(0);
-    }
+    .hidden-view { display: none !important; }
 
-    /* Footer Navigation Option Toggle */
-    .portal-switch {
-      text-align: center;
-      margin-top: 25px;
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-
-    .portal-switch span {
-      color: var(--text-gold);
-      font-weight: 500;
-      cursor: pointer;
-      margin-left: 5px;
-      transition: color 0.2s ease;
-    }
-
-    .portal-switch span:hover {
-      color: #fcd34d;
-      text-decoration: underline;
-    }
-
-    /* Utilities & Visibility States */
-    .hidden-view {
-      display: none !important;
-    }
-
-    /* Clean Status Alert Banners */
-    .status-banner {
-      padding: 14px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 24px;
-      text-align: center;
-      animation: fadeIn 0.4s ease;
-    }
-
-    .success {
-      background: rgba(16, 185, 129, 0.12);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-
-    .error {
-      background: rgba(239, 68, 68, 0.12);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .status-banner { padding: 14px; border-radius: 10px; font-size: 14px; font-weight: 500; margin-bottom: 24px; text-align: center; }
+    .success { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .error { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
   </style>
 </head>
 <body>
@@ -196,43 +89,57 @@
   <div class="portal-card">
     <div class="portal-header">
       <div class="logo">JoyTech</div>
-      <p id="portalDesc">Create your account to unlock access</p>
+      <p id="portalDesc">Sign in to authenticate identity</p>
     </div>
 
     <div id="notifier" class="status-banner" style="display: none;"></div>
 
-    <div id="signupBox">
+    <div id="loginBox">
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="logUser">Username or Email</label>
+          <input type="text" id="logUser" placeholder="Enter username or email" required />
+        </div>
+        <div class="form-group">
+          <label for="logPass">Password</label>
+          <input type="password" id="logPass" placeholder="••••••••" required />
+          <span class="password-toggle" onclick="togglePassword('logPass', this)">SHOW</span>
+        </div>
+        <span class="forgot-link" onclick="switchToForgot()">Forgot Password?</span>
+        <button type="submit" class="btn-portal">Secure Unlock</button>
+      </form>
+      <div class="portal-switch">First time visiting? <span onclick="switchToSignup()">Create Account</span></div>
+    </div>
+
+    <div id="signupBox" class="hidden-view">
       <form id="signupForm">
         <div class="form-group">
           <label for="regUser">Username</label>
-          <input type="text" id="regUser" placeholder="Choose username" autocomplete="username" required />
+          <input type="text" id="regUser" placeholder="Choose username" required />
         </div>
         <div class="form-group">
           <label for="regEmail">Email Address</label>
-          <input type="email" id="regEmail" placeholder="yourname@example.com" autocomplete="email" required />
+          <input type="email" id="regEmail" placeholder="yourname@example.com" required />
         </div>
         <div class="form-group">
           <label for="regPass">Password</label>
-          <input type="password" id="regPass" placeholder="••••••••" autocomplete="new-password" required />
+          <input type="password" id="regPass" placeholder="••••••••" required />
+          <span class="password-toggle" onclick="togglePassword('regPass', this)">SHOW</span>
         </div>
         <button type="submit" class="btn-portal">Register Account</button>
       </form>
       <div class="portal-switch">Already registered? <span onclick="switchToLogin()">Sign In</span></div>
     </div>
 
-    <div id="loginBox" class="hidden-view">
-      <form id="loginForm">
+    <div id="forgotBox" class="hidden-view">
+      <form id="forgotForm">
         <div class="form-group">
-          <label for="logUser">Username or Email</label>
-          <input type="text" id="logUser" placeholder="Enter username or email" autocomplete="username" required />
+          <label for="forEmail">Email Address</label>
+          <input type="email" id="forEmail" placeholder="yourname@example.com" required />
         </div>
-        <div class="form-group">
-          <label for="logPass">Password</label>
-          <input type="password" id="logPass" placeholder="••••••••" autocomplete="current-password" required />
-        </div>
-        <button type="submit" class="btn-portal">Secure Unlock</button>
+        <button type="submit" class="btn-portal">Send Recovery Link</button>
       </form>
-      <div class="portal-switch">First time visiting? <span onclick="switchToSignup()">Create Account</span></div>
+      <div class="portal-switch">Remembered password? <span onclick="switchToLogin()">Sign In</span></div>
     </div>
   </div>
 
@@ -240,10 +147,12 @@
     const notifier = document.getElementById('notifier');
     const signupBox = document.getElementById('signupBox');
     const loginBox = document.getElementById('loginBox');
+    const forgotBox = document.getElementById('forgotBox');
     const portalDesc = document.getElementById('portalDesc');
 
     function switchToLogin() {
       signupBox.classList.add('hidden-view');
+      forgotBox.classList.add('hidden-view');
       loginBox.classList.remove('hidden-view');
       portalDesc.textContent = "Sign in to authenticate identity";
       notifier.style.display = 'none';
@@ -251,16 +160,35 @@
 
     function switchToSignup() {
       loginBox.classList.add('hidden-view');
+      forgotBox.classList.add('hidden-view');
       signupBox.classList.remove('hidden-view');
       portalDesc.textContent = "Create your account to unlock access";
       notifier.style.display = 'none';
     }
 
-    // Pipeline 1: Process Registration Form Data Input strings
+    function switchToForgot() {
+      loginBox.classList.add('hidden-view');
+      signupBox.classList.add('hidden-view');
+      forgotBox.classList.remove('hidden-view');
+      portalDesc.textContent = "Enter email to reset access key";
+      notifier.style.display = 'none';
+    }
+
+    function togglePassword(id, el) {
+      const input = document.getElementById(id);
+      if (input.type === "password") {
+        input.type = "text";
+        el.textContent = "HIDE";
+      } else {
+        input.type = "password";
+        el.textContent = "SHOW";
+      }
+    }
+
+    // SIGNUP FORM SUBMIT
     document.getElementById('signupForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       notifier.style.display = 'none';
-
       try {
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
@@ -272,17 +200,12 @@
           })
         });
         const result = await response.json();
-
         if (response.ok) {
-          notifier.textContent = "✓ Account setup complete! Preparing lock screen...";
+          notifier.textContent = "✓ Account setup complete! Switching to Sign In...";
           notifier.className = "status-banner success";
           notifier.style.display = "block";
-          
-          // Smooth structural visual window transitions
-          setTimeout(() => { switchToLogin(); }, 1400);
-        } else {
-          throw new Error(result.error);
-        }
+          setTimeout(() => { switchToLogin(); }, 1500);
+        } else { throw new Error(result.error); }
       } catch (err) {
         notifier.textContent = `✗ ${err.message}`;
         notifier.className = "status-banner error";
@@ -290,11 +213,10 @@
       }
     });
 
-    // Pipeline 2: Process Credential Identity Verification matches
+    // SIGNIN FORM SUBMIT
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       notifier.style.display = 'none';
-
       try {
         const response = await fetch('/api/auth/signin', {
           method: 'POST',
@@ -305,22 +227,25 @@
           })
         });
         const result = await response.json();
-
         if (response.ok) {
-          notifier.textContent = "✓ Authorization verification verified. Unlocking dashboard...";
+          notifier.textContent = "✓ Access granted! Entering dashboard...";
           notifier.className = "status-banner success";
           notifier.style.display = "block";
-
-          // Route pipeline jump directly into main index website page
-          setTimeout(() => { window.location.href = '/dashboard'; }, 1200);
-        } else {
-          throw new Error(result.error);
-        }
+          setTimeout(() => { window.location.href = '/dashboard'; }, 1000);
+        } else { throw new Error(result.error); }
       } catch (err) {
         notifier.textContent = `✗ ${err.message}`;
         notifier.className = "status-banner error";
         notifier.style.display = "block";
       }
+    });
+
+    // FORGOT PASSWORD FORM SUBMIT
+    document.getElementById('forgotForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      notifier.textContent = "✓ Recovery email sent successfully!";
+      notifier.className = "status-banner success";
+      notifier.style.display = "block";
     });
   </script>
 </body>

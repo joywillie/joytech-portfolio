@@ -1,114 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Auth</title>
-<style>
-body{font-family:Arial;background:#0b1329;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh}
-.box{background:#111c3a;padding:20px;width:350px}
-input,button{width:100%;padding:10px;margin:5px 0}
-.hidden{display:none}
-.msg{margin:5px 0}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      width: 300px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .msg {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="box">
+  <div class="container">
+    <h2>Login</h2>
 
-<div id="msg"></div>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
 
-<div id="loginBox">
-<input id="loginUser" placeholder="Username/email">
-<input id="loginPass" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
-<p onclick="showSignup()">Signup</p>
-</div>
+      <button type="submit">Login</button>
+    </form>
 
-<div id="signupBox" class="hidden">
-<input id="signupUser" placeholder="Username">
-<input id="signupEmail" placeholder="Email">
-<input id="signupPass" type="password" placeholder="Password">
-<button onclick="signup()">Signup</button>
-<p onclick="showLogin()">Login</p>
-</div>
+    <div class="msg" id="msg"></div>
+  </div>
 
-</div>
+  <script>
+    const form = document.getElementById("loginForm");
+    const msg = document.getElementById("msg");
 
-<script>
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-const msg = document.getElementById("msg");
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
 
-function showSignup(){
-  loginBox.classList.add("hidden");
-  signupBox.classList.remove("hidden");
-}
+      try {
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ email, password })
+        });
 
-function showLogin(){
-  signupBox.classList.add("hidden");
-  loginBox.classList.remove("hidden");
-}
+        const data = await response.json();
 
-// SIGNUP
-async function signup(){
-  const res = await fetch("/api/auth/signup",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      username:signupUser.value,
-      email:signupEmail.value,
-      password:signupPass.value
-    })
-  });
+        if (response.ok) {
+          msg.style.color = "green";
+          msg.textContent = "Login successful... redirecting";
 
-  const data = await res.json();
+          localStorage.setItem("token", data.token);
 
-  if(!res.ok){
-    msg.innerText = data.error;
-    return;
-  }
+          setTimeout(() => {
+            window.location.href = "/dashboard";
+          }, 1000);
 
-  msg.innerText = "Signup success";
+        } else {
+          msg.style.color = "red";
+          msg.textContent = data.message || "Login failed";
+        }
 
-  signupUser.value="";
-  signupEmail.value="";
-  signupPass.value="";
-
-  showLogin();
-}
-
-// LOGIN
-async function login(){
-  const res = await fetch("/api/auth/signin",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      userKey:loginUser.value,
-      password:loginPass.value
-    })
-  });
-
-  const data = await res.json();
-
-  if(!res.ok){
-    msg.innerText = data.error;
-    return;
-  }
-
-  if(!data.token){
-    msg.innerText = "No token received";
-    return;
-  }
-
-  localStorage.setItem("token", data.token);
-
-  window.location.href="/dashboard";
-}
-
-// AUTO CHECK
-if(localStorage.getItem("token")){
-  window.location.href="/dashboard";
-}
-
-</script>
+      } catch (error) {
+        msg.style.color = "red";
+        msg.textContent = "Server error. Try again.";
+      }
+    });
+  </script>
 
 </body>
 </html>

@@ -227,11 +227,46 @@
           })
         });
         const result = await response.json();
-        if (response.ok) {
-          notifier.textContent = "✓ Access granted! Entering dashboard...";
-          notifier.className = "status-banner success";
-          notifier.style.display = "block";
-          setTimeout(() => { window.location.href = '/dashboard'; }, 1000);
+      if (response.ok) {
+
+
+  // SAVE LOGIN SESSION
+
+  localStorage.setItem(
+    "token",
+    result.token
+  );
+
+
+  localStorage.setItem(
+    "user",
+    JSON.stringify({
+      name: result.user?.username || result.user?.name || "Joyce"
+    })
+  );
+
+
+  notifier.textContent =
+  "✓ Access granted! Opening JoyTech Portfolio...";
+
+
+  notifier.className =
+  "status-banner success";
+
+
+  notifier.style.display =
+  "block";
+
+
+
+  setTimeout(()=>{
+
+      window.location.href="index.html";
+
+  },1000);
+
+
+}
         } else { throw new Error(result.error); }
       } catch (err) {
         notifier.textContent = `✗ ${err.message}`;

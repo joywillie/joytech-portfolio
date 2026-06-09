@@ -186,33 +186,44 @@
     }
 
     // SIGNUP FORM SUBMIT
-    document.getElementById('signupForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      notifier.style.display = 'none';
-      try {
-        const response = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: document.getElementById('regUser').value,
-            email: document.getElementById('regEmail').value,
-            password: document.getElementById('regPass').value
-          })
-        });
-        const result = await response.json();
-        if (response.ok) {
-          notifier.textContent = "✓ Account setup complete! Switching to Sign In...";
-          notifier.className = "status-banner success";
-          notifier.style.display = "block";
-          setTimeout(() => { switchToLogin(); }, 1500);
-        } else { throw new Error(result.error); }
-      } catch (err) {
-        notifier.textContent = `✗ ${err.message}`;
-        notifier.className = "status-banner error";
-        notifier.style.display = "block";
-      }
+   document.getElementById('signupForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  console.log("Signup clicked");
+
+  notifier.style.display = 'none';
+
+  try {
+    const response = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: document.getElementById('regUser').value,
+        email: document.getElementById('regEmail').value,
+        password: document.getElementById('regPass').value
+      })
     });
 
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Signup failed");
+    }
+
+    notifier.textContent = "✓ Account created successfully!";
+    notifier.className = "status-banner success";
+    notifier.style.display = "block";
+
+    setTimeout(() => {
+      switchToLogin();
+    }, 1200);
+
+  } catch (err) {
+    notifier.textContent = `✗ ${err.message}`;
+    notifier.className = "status-banner error";
+    notifier.style.display = "block";
+  }
+});
    document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   notifier.style.display = 'none';

@@ -8,7 +8,6 @@ require("dotenv").config();
 
 const app = express();
 
-// ================= MIDDLEWARE =================
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
@@ -19,24 +18,14 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// ================= INIT DB =================
+// ================= INIT =================
 (async () => {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
-      username TEXT UNIQUE NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL
-    );
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS messages (
-      id SERIAL PRIMARY KEY,
-      name TEXT,
-      email TEXT,
-      message TEXT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      username TEXT UNIQUE,
+      email TEXT UNIQUE,
+      password TEXT
     );
   `);
 
@@ -51,29 +40,31 @@ app.post("/api/auth/signup", async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
-      "INSERT INTO users (username, email, password) VALUES ($1,$2,$3) RETURNING id, username, email",
+      "INSERT INTO users(username,email,password) VALUES($1,$2,$3) RETURNING id,username,email",
       [username, email, hash]
     );
 
     res.json({ success: true, user: result.rows[0] });
 
   } catch (err) {
-    if (err.code === "23505") {
-      return res.status(400).json({ error: "User already exists" });
-    }
+    console.log(err);
     res.status(500).json({ error: "Signup failed" });
   }
 });
 
-// ================= SIGNIN =================
+// ================= SIGNIN (DEBUG SAFE) =================
 app.post("/api/auth/signin", async (req, res) => {
   try {
+    console.log("LOGIN BODY:", req.body);
+
     const { userKey, password } = req.body;
 
     const result = await pool.query(
       "SELECT * FROM users WHERE username=$1 OR email=$1",
       [userKey]
     );
+
+    console.log("USER COUNT:", result.rows.length);
 
     if (result.rows.length === 0) {
       return res.status(401).json({ error: "User not found" });
@@ -83,8 +74,14 @@ app.post("/api/auth/signin", async (req, res) => {
 
     const ok = await bcrypt.compare(password, user.password);
 
+    console.log("PASSWORD MATCH:", ok);
+
     if (!ok) {
       return res.status(401).json({ error: "Wrong password" });
+    }
+
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({ error: "JWT_SECRET missing" });
     }
 
     const token = jwt.sign(
@@ -100,25 +97,8 @@ app.post("/api/auth/signin", async (req, res) => {
     });
 
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Login failed" });
-  }
-});
-
-// ================= CONTACT =================
-app.post("/api/contact", async (req, res) => {
-  try {
-    const { name, email, message } = req.body;
-
-    const result = await pool.query(
-      "INSERT INTO messages (name,email,message) VALUES ($1,$2,$3) RETURNING *",
-      [name, email, message]
-    );
-
-    res.json({ success: true, data: result.rows[0] });
-
-  } catch {
-    res.status(500).json({ error: "Failed" });
+    console.log("LOGIN ERROR:", err);
+    res.status(500).json({ error: "Login failed server error" });
   }
 });
 

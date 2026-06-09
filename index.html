@@ -1,236 +1,388 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JoyTech Portfolio</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="style.css">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>JoyTech Portfolio</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
 </head>
+
+
 <body>
 
-  <header>
-    <div class="logo">JoyTech</div>
-    
-    <button class="menu-toggle" aria-label="Toggle navigation menu" aria-controls="main-navigation">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
 
-    <nav id="main-navigation">
-      <a href="#home">Home</a>
-      <a href="#about">About</a>
-      <a href="#skills">Skills</a>
-      <a href="#projects">Projects</a>
-      <a href="#contact">Contact</a>
-      <a href="/" onclick="window.location.replace('/'); return false;" style="color: #f87171; font-weight: 600; border: 1px solid #f87171; padding: 5px 12px; border-radius: 6px; margin-left: 10px; display: inline-block;">Log Out</a>
-    </nav>
-  </header>
+<header>
 
-  <section class="hero" id="home">
-    <div class="hero-text">
-      <h3>Hello, I'm</h3>
-      <h1>Joyce William</h1>
-      <h2>ICT Technician & Web Developer</h2>
-      <p>
-        Passionate about web development, UI design,
-        mobile applications, and creating beautiful
-        modern digital experiences.
-      </p>
-      <div class="buttons">
-        <a href="#projects" class="btn">View Projects</a>
-        <a href="#contact" class="btn-outline">Contact Me</a>
-      </div>
-    </div>
-    <div class="hero-image">
-      <img src="image1.jpg" alt="Profile Picture">
-    </div>
-  </section>
+<div class="logo">
+JoyTech
+</div>
 
-  <section class="about" id="about">
-    <div class="section-title">
-      <h2>About Me</h2>
-    </div>
-    <p>
-      I am an ICT Technician.
-      I enjoy building websites, designing mobile apps,
-      and creating attractive digital content.
-      My goal is to grow professionally in software
-      development and UI/UX design.
-    </p>
-  </section>
 
-  <section class="skills" id="skills">
-    <div class="section-title">
-      <h2>My Skills</h2>
-    </div>
-    <div class="skills-container">
-      <div class="skill-card"><h3>HTML</h3></div>
-      <div class="skill-card"><h3>CSS</h3></div>
-      <div class="skill-card"><h3>JavaScript</h3></div>
-      <div class="skill-card"><h3>Flutter</h3></div>
-      <div class="skill-card"><h3>Canva Design</h3></div>
-      <div class="skill-card"><h3>UI/UX Design</h3></div>
-    </div>
-  </section>
+<button class="menu-toggle" aria-label="Toggle navigation menu">
 
-  <section class="projects" id="projects">
-    <div class="section-title">
-      <h2>Projects</h2>
-    </div>
-    <div class="project-container">
-      <div class="project-card">
-        <img src="image.png" alt="Calculator App Screenshot">
-        <h3>Calculator App</h3>
-        <p>Modern Flutter mobile application with stylish user interface design.</p>
-      </div>
-      <div class="project-card">
-        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop" alt="Digital Design Layout">
-        <h3>Graduation Posters</h3>
-        <p>Creative graduation card and poster designs using Canva.</p>
-      </div>
-      <div class="project-card">
-        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop" alt="Code on Screen">
-        <h3>Portfolio Website</h3>
-        <p>Responsive personal portfolio website built using HTML, CSS and JavaScript.</p>
-      </div>
-    </div>
-  </section>
+<span></span>
+<span></span>
+<span></span>
 
-  <section class="contact" id="contact">
-    <div class="section-title">
-      <h2>Contact Me</h2>
-    </div>
+</button>
 
-    <div class="contact-wrapper">
-      
-      <div class="contact-info">
-        <div class="info-item">
-          <h4>Call Me</h4>
-          <a href="tel:0745806435">0745806435</a>
-        </div>
-        <div class="info-item">
-          <h4>WhatsApp Me</h4>
-          <a href="https://wa.me/254745806435" target="_blank">Chat on WhatsApp</a>
-        </div>
-        <div class="info-item">
-          <h4>Email Me</h4>
-          <a href="mailto:jw42205769@gmail.com">jw42205769@gmail.com</a>
-        </div>
-      </div>
 
-      <div class="form-container">
-        <div id="successAlert" class="form-alert success-message" style="display: none;">
-          ✓ Message sent successfully! I will get back to you shortly.
-        </div>
-        <div id="errorAlert" class="form-alert error-message" style="display: none;">
-          ✗ Failed to send. Please check your connectivity and try again.
-        </div>
 
-        <form id="contact-form" class="custom-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="name">Your Name</label>
-              <input type="text" id="name" placeholder="John Doe" required />
-            </div>
-            <div class="form-group">
-              <label for="email">Email Address</label>
-              <input type="email" id="email" placeholder="client@example.com" required />
-            </div>
-          </div>
+<nav id="main-navigation">
 
-          <div class="form-group">
-            <label for="service">Requested Domain / Service</label>
-            <select id="service" required>
-              <option value="" disabled selected>Select an operational domain...</option>
-              <option value="mobile_app">Mobile App</option>
-              <option value="responsive_websites">Responsive Websites</option>
-              <option value="posters">Posters</option>
-              <option value="flyers">Flyers</option>
-            </select>
-          </div>
+<a href="#home">Home</a>
 
-          <div class="form-group">
-            <label for="message">Detailed Scope & Requirements</label>
-            <textarea id="message" placeholder="Outline specific technical requirements, design themes, or project timelines..." required></textarea>
-          </div>
+<a href="#about">About</a>
 
-          <button type="submit" class="btn-submit">Send Message</button>
-        </form>
-      </div>
+<a href="#skills">Skills</a>
 
-    </div>
-  </section>
+<a href="#projects">Projects</a>
 
-  <footer>
-    <div class="footer-contacts">
-      <a href="tel:0745806435">Call</a> | 
-      <a href="https://wa.me/254745806435" target="_blank">WhatsApp</a> | 
-      <a href="mailto:jw42205769@gmail.com">Email</a>
-    </div>
-    <p>© 2026 JoyTech Portfolio | Designed by Joyce William</p>
-  </footer>
+<a href="#contact">Contact</a>
 
-  <script>
-    // MOBILE RESPONSIVE HAMBURGER NAVIGATION
-    const menuToggle = document.querySelector('.menu-toggle');
-    const mainNav = document.getElementById('main-navigation');
-    const navLinks = document.querySelectorAll('#main-navigation a');
 
-    menuToggle.addEventListener('click', () => {
-      menuToggle.classList.toggle('active');
-      mainNav.classList.toggle('active');
-    });
+<a href="#" 
+id="logoutBtn"
+style="
+color:#f87171;
+font-weight:600;
+border:1px solid #f87171;
+padding:5px 12px;
+border-radius:6px;
+margin-left:10px;">
+Logout
+</a>
 
-    navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        menuToggle.classList.remove('active');
-        mainNav.classList.remove('active');
-      });
-    });
 
-    // CONTACT DATA BACKEND TRANSFERS
-    const contactForm = document.getElementById('contact-form');
-    const successAlert = document.getElementById('successAlert');
-    const errorAlert = document.getElementById('errorAlert');
-    const submitBtn = document.querySelector('.btn-submit');
+</nav>
 
-    contactForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const service = document.getElementById('service').value;
-      const messageText = document.getElementById('message').value;
-      const formattedMessage = `[Service: ${service}] ${messageText}`;
+</header>
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Sending...';
-      successAlert.style.display = 'none';
-      errorAlert.style.display = 'none';
 
-      try {
-        const response = await fetch('/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: name, email: email, message: formattedMessage })
-        });
-        const result = await response.json();
-        if (response.ok && result.success) {
-          successAlert.style.display = 'block';
-          contactForm.reset();
-        } else { throw new Error(result.error || 'Server processing error.'); }
-      } catch (err) {
-        errorAlert.textContent = `✗ Error: ${err.message || 'Unable to sync with your website server.'}`;
-        errorAlert.style.display = 'block';
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Send Message';
-      }
-    });
-  </script>
-</body>
-</html>
+
+
+
+<section class="hero" id="home">
+
+
+<div class="hero-text">
+
+
+<h3 id="welcomeText">
+Hello, I'm
+</h3>
+
+
+<h1>
+Joyce William
+</h1>
+
+
+<h2>
+ICT Technician & Web Developer
+</h2>
+
+
+<p>
+
+Passionate about web development, UI design,
+mobile applications, and creating beautiful
+modern digital experiences.
+
+</p>
+
+
+
+<div class="buttons">
+
+
+<a href="#projects" class="btn">
+View Projects
+</a>
+
+
+<a href="#contact" class="btn-outline">
+Contact Me
+</a>
+
+
+</div>
+
+
+</div>
+
+
+
+<div class="hero-image">
+
+
+<img src="image1.jpg" alt="Profile Picture">
+
+
+</div>
+
+
+</section><script>
+
+
+// ===============================
+// AUTHENTICATION CHECK
+// ===============================
+
+const token = localStorage.getItem("token");
+
+
+if(!token){
+
+    window.location.href = "auth.html";
+
+}
+
+
+
+// ===============================
+// DISPLAY LOGGED USER
+// ===============================
+
+const user = JSON.parse(localStorage.getItem("user"));
+
+
+if(user){
+
+    document.getElementById("welcomeText").innerHTML =
+    `Hello, ${user.name}`;
+
+}
+
+
+
+// ===============================
+// LOGOUT
+// ===============================
+
+const logoutBtn = document.getElementById("logoutBtn");
+
+
+logoutBtn.addEventListener("click",()=>{
+
+
+    localStorage.removeItem("token");
+
+    localStorage.removeItem("user");
+
+
+    window.location.href="auth.html";
+
+
+});
+
+
+
+
+// ===============================
+// MOBILE MENU
+// ===============================
+
+
+const menuToggle =
+document.querySelector(".menu-toggle");
+
+
+const mainNav =
+document.getElementById("main-navigation");
+
+
+
+menuToggle.addEventListener("click",()=>{
+
+
+menuToggle.classList.toggle("active");
+
+
+mainNav.classList.toggle("active");
+
+
+});
+
+
+
+const navLinks =
+document.querySelectorAll("#main-navigation a");
+
+
+navLinks.forEach(link=>{
+
+
+link.addEventListener("click",()=>{
+
+
+menuToggle.classList.remove("active");
+
+
+mainNav.classList.remove("active");
+
+
+});
+
+
+});
+
+
+
+
+
+// ===============================
+// CONTACT FORM
+// ===============================
+
+
+const contactForm =
+document.getElementById("contact-form");
+
+
+const successAlert =
+document.getElementById("successAlert");
+
+
+const errorAlert =
+document.getElementById("errorAlert");
+
+
+const submitBtn =
+document.querySelector(".btn-submit");
+
+
+
+contactForm.addEventListener("submit", async(e)=>{
+
+
+e.preventDefault();
+
+
+
+const name =
+document.getElementById("name").value;
+
+
+
+const email =
+document.getElementById("email").value;
+
+
+
+const service =
+document.getElementById("service").value;
+
+
+
+const message =
+document.getElementById("message").value;
+
+
+
+
+submitBtn.disabled=true;
+
+submitBtn.textContent="Sending...";
+
+
+
+try{
+
+
+const response =
+await fetch("/api/contact",{
+
+
+method:"POST",
+
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+
+body:JSON.stringify({
+
+name,
+
+email,
+
+message:`[${service}] ${message}`
+
+})
+
+
+});
+
+
+
+const result =
+await response.json();
+
+
+
+if(response.ok){
+
+
+successAlert.style.display="block";
+
+
+contactForm.reset();
+
+
+}
+
+else{
+
+
+throw new Error(result.error);
+
+}
+
+
+
+}
+
+catch(error){
+
+
+errorAlert.innerHTML =
+"✗ "+error.message;
+
+
+errorAlert.style.display="block";
+
+
+}
+
+
+
+finally{
+
+
+submitBtn.disabled=false;
+
+
+submitBtn.textContent="Send Message";
+
+
+}
+
+
+
+});
+
+
+
+</script>

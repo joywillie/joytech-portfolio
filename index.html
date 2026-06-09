@@ -9,80 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* ==========================================================================
-       AUTHENTICATION MODAL STYLES (GLASSMORPHISM POPUP)
-       ========================================================================== */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(11, 19, 41, 0.85);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 2000; opacity: 0; pointer-events: none;
-      transition: all 0.4s ease;
-    }
-    .modal-overlay.active { opacity: 1; pointer-events: auto; }
-    
-    .auth-modal {
-      background: #111c3a;
-      border: 1px solid rgba(29, 78, 216, 0.3);
-      width: 100%; max-width: 420px;
-      border-radius: 16px; padding: 35px 30px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-      position: relative; transform: translateY(-20px);
-      transition: all 0.4s ease;
-    }
-    .modal-overlay.active .auth-modal { transform: translateY(0); }
-    
-    .close-modal {
-      position: absolute; top: 15px; right: 20px;
-      font-size: 24px; color: #94a3b8; cursor: pointer;
-      transition: color 0.2s;
-    }
-    .close-modal:hover { color: #fbbf24; }
-    
-    .auth-header { text-align: center; margin-bottom: 25px; }
-    .auth-header h3 { color: #fbbf24; font-size: 24px; margin-bottom: 5px; }
-    .auth-header p { color: #94a3b8; font-size: 13px; }
-    
-    .auth-form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; position: relative; }
-    .auth-form-group label { font-size: 13px; color: #94a3b8; }
-    .auth-form-group input {
-      background: #0b1329; border: 1px solid #1d4ed8;
-      padding: 12px 40px 12px 14px; border-radius: 8px;
-      color: #fff; font-size: 14px; outline: none;
-    }
-    .auth-form-group input:focus { border-color: #fbbf24; }
-    
-    /* Show/Hide Password Eye Button */
-    .password-toggle {
-      position: absolute; right: 14px; bottom: 12px;
-      font-size: 12px; color: #94a3b8; cursor: pointer;
-      user-select: none; font-weight: 600;
-    }
-    .password-toggle:hover { color: #fbbf24; }
-    
-    .auth-options { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-    .forgot-link { font-size: 12px; color: #fbbf24; text-decoration: underline; cursor: pointer; }
-    
-    .btn-auth-submit {
-      background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-      color: #fff; border: none; padding: 12px; border-radius: 8px;
-      font-weight: 600; width: 100%; cursor: pointer; transition: all 0.3s;
-    }
-    .btn-auth-submit:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(29,78,216,0.3); }
-    
-    .auth-switch { text-align: center; margin-top: 20px; font-size: 13px; color: #94a3b8; }
-    .auth-switch span { color: #fbbf24; cursor: pointer; text-decoration: underline; font-weight: 500; }
-    
-    .hidden-panel { display: none !important; }
-    
-    .auth-alert { padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px; text-align: center; display: none; }
-    .auth-alert.err { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid #ef4444; }
-    .auth-alert.succ { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid #10b981; }
-  </style>
 </head>
 <body>
 
@@ -101,80 +27,9 @@
       <a href="#skills">Skills</a>
       <a href="#projects">Projects</a>
       <a href="#contact">Contact</a>
-      <button class="btn" id="openAuthBtn" style="padding: 6px 15px; margin-left: 10px; font-size: 14px;">Sign In</button>
+      <a href="/" style="color: #f87171; font-weight: 600; border: 1px solid #f87171; padding: 5px 12px; border-radius: 6px; margin-left: 10px; display: inline-block;">Log Out</a>
     </nav>
   </header>
-
-  <div class="modal-overlay" id="authModalOverlay">
-    <div class="auth-modal">
-      <span class="close-modal" id="closeAuthBtn">&times;</span>
-      
-      <div id="authAlert" class="auth-alert"></div>
-
-      <div id="panelSignIn">
-        <div class="auth-header">
-          <h3>Welcome Back</h3>
-          <p>Sign in to access your tech portal account</p>
-        </div>
-        <form id="formSignIn">
-          <div class="auth-form-group">
-            <label>Username or Email</label>
-            <input type="text" id="loginUser" placeholder="Enter username or email" required />
-          </div>
-          <div class="auth-form-group">
-            <label>Password</label>
-            <input type="password" id="loginPass" placeholder="••••••••" required />
-            <span class="password-toggle" onclick="togglePasswordVisibility('loginPass', this)">SHOW</span>
-          </div>
-          <div class="auth-options">
-            <span class="forgot-link" onclick="showPanel('Forgot')">Forgot Password?</span>
-          </div>
-          <button type="submit" class="btn-auth-submit">Secure Log In</button>
-        </form>
-        <div class="auth-switch">Don't have an account? <span onclick="showPanel('SignUp')">Sign Up</span></div>
-      </div>
-
-      <div id="panelSignUp" class="hidden-panel">
-        <div class="auth-header">
-          <h3>Create Account</h3>
-          <p>Register your details to create a new profile</p>
-        </div>
-        <form id="formSignUp">
-          <div class="auth-form-group">
-            <label>Username</label>
-            <input type="text" id="registerUser" placeholder="Choose a username" required />
-          </div>
-          <div class="auth-form-group">
-            <label>Email Address</label>
-            <input type="email" id="registerEmail" placeholder="name@example.com" required />
-          </div>
-          <div class="auth-form-group">
-            <label>Password</label>
-            <input type="password" id="registerPass" placeholder="••••••••" required />
-            <span class="password-toggle" onclick="togglePasswordVisibility('registerPass', this)">SHOW</span>
-          </div>
-          <button type="submit" class="btn-auth-submit">Register Account</button>
-        </form>
-        <div class="auth-switch">Already registered? <span onclick="showPanel('SignIn')">Sign In</span></div>
-      </div>
-
-      <div id="panelForgot" class="hidden-panel">
-        <div class="auth-header">
-          <h3>Reset Password</h3>
-          <p>Enter your email to receive recovery parameters</p>
-        </div>
-        <form id="formForgot">
-          <div class="auth-form-group">
-            <label>Registered Email Address</label>
-            <input type="email" id="forgotEmail" placeholder="name@example.com" required />
-          </div>
-          <button type="submit" class="btn-auth-submit">Send Password Reset</button>
-        </form>
-        <div class="auth-switch">Remembered credentials? <span onclick="showPanel('SignIn')">Sign In</span></div>
-      </div>
-
-    </div>
-  </div>
 
   <section class="hero" id="home">
     <div class="hero-text">
@@ -321,7 +176,7 @@
   </footer>
 
   <script>
-    // 1. MOBILE RESPONSIVE HAMBURGER NAVIGATION
+    // MOBILE RESPONSIVE HAMBURGER NAVIGATION
     const menuToggle = document.querySelector('.menu-toggle');
     const mainNav = document.getElementById('main-navigation');
     const navLinks = document.querySelectorAll('#main-navigation a');
@@ -338,107 +193,7 @@
       });
     });
 
-    // ==========================================================================
-    // 2. AUTH MODAL WORKFLOW & NAVIGATION INTERACTION
-    // ==========================================================================
-    const authOverlay = document.getElementById('authModalOverlay');
-    const openAuthBtn = document.getElementById('openAuthBtn');
-    const closeAuthBtn = document.getElementById('closeAuthBtn');
-    const authAlert = document.getElementById('authAlert');
-
-    openAuthBtn.addEventListener('click', () => { authOverlay.classList.add('active'); showPanel('SignIn'); });
-    closeAuthBtn.addEventListener('click', () => authOverlay.classList.remove('active'));
-    
-    // Closes popup if user clicks on dark outside area
-    authOverlay.addEventListener('click', (e) => { if(e.target === authOverlay) authOverlay.classList.remove('active'); });
-
-    function showPanel(panelType) {
-      document.getElementById('panelSignIn').classList.add('hidden-panel');
-      document.getElementById('panelSignUp').classList.add('hidden-panel');
-      document.getElementById('panelForgot').classList.add('hidden-panel');
-      authAlert.style.display = 'none';
-
-      document.getElementById(`panel${panelType}`).classList.remove('hidden-panel');
-    }
-
-    // Toggle password plain-text visibility (Show / Hide password switch)
-    function togglePasswordVisibility(inputId, toggleTextElement) {
-      const targetInput = document.getElementById(inputId);
-      if (targetInput.type === "password") {
-        targetInput.type = "text";
-        toggleTextElement.textContent = "HIDE";
-      } else {
-        targetInput.type = "password";
-        toggleTextElement.textContent = "SHOW";
-      }
-    }
-
-    // Handle Signup API post submissions
-    document.getElementById('formSignUp').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      authAlert.style.display = 'none';
-      try {
-        const response = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: document.getElementById('registerUser').value,
-            email: document.getElementById('registerEmail').value,
-            password: document.getElementById('registerPass').value
-          })
-        });
-        const data = await response.json();
-        if(response.ok) {
-          authAlert.className = "auth-alert succ";
-          authAlert.textContent = "✓ Success! Redirecting to login portal...";
-          authAlert.style.display = "block";
-          setTimeout(() => showPanel('SignIn'), 1500);
-        } else { throw new Error(data.error); }
-      } catch(err) {
-        authAlert.className = "auth-alert err";
-        authAlert.textContent = `✗ ${err.message}`;
-        authAlert.style.display = "block";
-      }
-    });
-
-    // Handle Login authentication checking pipeline
-    document.getElementById('formSignIn').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      authAlert.style.display = 'none';
-      try {
-        const response = await fetch('/api/auth/signin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userKey: document.getElementById('loginUser').value,
-            password: document.getElementById('loginPass').value
-          })
-        });
-        const data = await response.json();
-        if(response.ok) {
-          authAlert.className = "auth-alert succ";
-          authAlert.textContent = "✓ Access Verified! Welcome.";
-          authAlert.style.display = "block";
-          setTimeout(() => { authOverlay.classList.remove('active'); }, 1000);
-        } else { throw new Error(data.error); }
-      } catch(err) {
-        authAlert.className = "auth-alert err";
-        authAlert.textContent = `✗ ${err.message}`;
-        authAlert.style.display = "block";
-      }
-    });
-
-    // Handle placeholder frontend alert for Forgot Password flow
-    document.getElementById('formForgot').addEventListener('submit', (e) => {
-      e.preventDefault();
-      authAlert.className = "auth-alert succ";
-      authAlert.textContent = "✓ Recovery email dispatched successfully.";
-      authAlert.style.display = "block";
-    });
-
-    // ==========================================================================
-    // 3. CONTACT DATA BACKEND TRANSFERS
-    // ==========================================================================
+    // CONTACT DATA BACKEND TRANSFERS
     const contactForm = document.getElementById('contact-form');
     const successAlert = document.getElementById('successAlert');
     const errorAlert = document.getElementById('errorAlert');

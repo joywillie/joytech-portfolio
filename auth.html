@@ -213,19 +213,50 @@
       }
     });
 
-    // SIGNIN FORM SUBMIT
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      notifier.style.display = 'none';
-      try {
-        const response = await fetch('/api/auth/signin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userKey: document.getElementById('logUser').value,
-            password: document.getElementById('logPass').value
-          })
-        });
+   document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  notifier.style.display = 'none';
+
+  try {
+    const response = await fetch('/api/auth/signin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userKey: document.getElementById('logUser').value,
+        password: document.getElementById('logPass').value
+      })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Login failed");
+    }
+
+    // SAVE TOKEN
+    localStorage.setItem("token", result.token);
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        name: result.user?.username || "User"
+      })
+    );
+
+    notifier.textContent = "✓ Access granted! Opening JoyTech Portfolio...";
+    notifier.className = "status-banner success";
+    notifier.style.display = "block";
+
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 1000);
+
+  } catch (err) {
+    notifier.textContent = `✗ ${err.message}`;
+    notifier.className = "status-banner error";
+    notifier.style.display = "block";
+  }
+});
         const result = await response.json();
       if (response.ok) {
 

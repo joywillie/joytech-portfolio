@@ -2,29 +2,30 @@ const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const app = express();
 
-// Global Security and Request Parsing Middleware
-app.use(cors());
-app.use(express.json());
+// ====================== MIDDLEWARE ======================
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST']
+}));
 
-// Serve Static Assets Safely from Root Directory
+app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Neon SQL Cloud Database Connection Core
+// ====================== DATABASE ======================
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false
-    }
+    ssl: { rejectUnauthorized: false }
 });
 
-// Database Infrastructure Initialization
+// ====================== INIT DB ======================
 const initDB = async () => {
     try {
-        // Create messages table
         await pool.query(`
             CREATE TABLE IF NOT EXISTS messages (
                 id SERIAL PRIMARY KEY,
@@ -34,8 +35,7 @@ const initDB = async () => {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
-        
-        // Create users table for authentication credentials
+
         await pool.query(`
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
@@ -45,109 +45,160 @@ const initDB = async () => {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
-        console.log("Neon Database Architecture Synced Cleanly.");
+
+        console.log("Database synced successfully.");
     } catch (err) {
-        console.error("Critical Infrastructure Initialization Fault:", err);
+        console.error("DB Init Error:", err);
     }
 };
+
 initDB();
 
-/* ==========================================================================
-   STRICT GATE ROUTING SYSTEM (THE LOCK)
-   ========================================================================== */
+// ====================== AUTH ROUTES ======================
 
-/**
- * ROOT ROUTE: Force users to authenticate via auth.html first
- */
+// SIGN UP
+app.post('/api/auth/signup', async (req, res) => {
+    const { username, email, password } = req.body;
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const query = `
+            INSERT INTO users(username, email, password)
+            VALUES($1, $2, $3)
+            RETURNING id, username, email
+        `;
+
+        const result = await pool.query(query, [
+            username,
+            email,
+            hashedPassword
+        ]);
+
+        res.status(201).json({
+            success: true,
+            user: result.rows[0]
+        });
+
+    } catch (err) {
+        if (err.code === '23505') {
+            return res.status(400).json({
+                error: "Username or Email already exists."
+            });
+        }
+
+        res.status(500).json({ error: "Signup failed." });
+    }
+});
+
+// SIGN IN
+app.post('/api/auth/signin', async (req, res) => {
+    const { userKey, password } = req.body;
+
+    try {
+        const query = `
+            SELECT * FROM users
+            WHERE username = $1 OR email = $1
+        `;
+
+        const result = await pool.query(query, [userKey]);
+
+        if (result.rows.length === 0) {
+            return res.status(401).json({ error: "User not found." });
+        }
+
+        const user = result.rows[0];
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.status(401).json({ error: "Wrong password." });
+        }
+
+        const token = jwt.sign(
+            { id: user.id, username: user.username },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        res.json({
+            success: true,
+            message: "Login successful",
+            token
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Login failed." });
+    }
+});
+
+// ====================== CONTACT ======================
+app.post('/api/contact', async (req, res) => {
+    const { name, email, message } = req.body;
+
+    try {
+        const query = `
+            INSERT INTO messages(name, email, message)
+            VALUES($1, $2, $3)
+            RETURNING *
+        `;
+
+        const result = await pool.query(query, [name, email, message]);
+
+        res.status(201).json({
+            success: true,
+            data: result.rows[0]
+        });
+
+    } catch (err) {
+        res.status(500).json({ error: "Failed to save message." });
+    }
+});
+
+// GET MESSAGES
+app.get('/api/messages', async (req, res) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM messages ORDER BY created_at DESC'
+        );
+
+        res.json(result.rows);
+
+    } catch (err) {
+        res.status(500).json({ error: "Error fetching messages." });
+    }
+});
+
+// ====================== ROUTES ======================
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'auth.html'));
 });
 
-/**
- * DASHBOARD ROUTE: Your actual portfolio is safely loaded here after authorization
- */
-app.get('/dashboard', (req, res) => {
+// PROTECTED DASHBOARD (FIXED)
+const authMiddleware = (req, res, next) => {
+    const header = req.headers.authorization;
+
+    if (!header) {
+        return res.status(401).json({ error: "No token provided" });
+    }
+
+    try {
+        const token = header.split(' ')[1];
+        jwt.verify(token, process.env.JWT_SECRET);
+        next();
+    } catch {
+        res.status(403).json({ error: "Invalid token" });
+    }
+};
+
+app.get('/dashboard', authMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-
-/* ==========================================================================
-   AUTHENTICATION API ENDPOINTS
-   ========================================================================== */
-
-// Sign Up Endpoint
-app.post('/api/auth/signup', async (req, res) => {
-    const { username, email, password } = req.body;
-    try {
-        const queryText = 'INSERT INTO users(username, email, password) VALUES($1, $2, $3) RETURNING id, username, email';
-        const result = await pool.query(queryText, [username, email, password]);
-        res.status(201).json({ success: true, user: result.rows[0] });
-    } catch (err) {
-        if (err.code === '23505') {
-            return res.status(400).json({ error: "Username or Email already registered." });
-        }
-        res.status(500).json({ error: "Server error during registration workflow." });
-    }
-});
-
-// Sign In Endpoint
-app.post('/api/auth/signin', async (req, res) => {
-    const { userKey, password } = req.body;
-    try {
-        const queryText = 'SELECT * FROM users WHERE (username = $1 OR email = $1) AND password = $2';
-        const result = await pool.query(queryText, [userKey, password]);
-
-        if (result.rows.length > 0) {
-            res.json({ success: true, message: "Authentication verified." });
-        } else {
-            res.status(401).json({ error: "Invalid username, email, or password credentials." });
-        }
-    } catch (err) {
-        res.status(500).json({ error: "Server authentication interface error." });
-    }
-});
-
-
-/* ==========================================================================
-   CONTACT FORM HANDLERS
-   ========================================================================== */
-
-app.post('/api/contact', async (req, res) => {
-    const { name, email, message } = req.body;
-    try {
-        const queryText = 'INSERT INTO messages(name, email, message) VALUES($1, $2, $3) RETURNING *';
-        const result = await pool.query(queryText, [name, email, message]);
-        
-        try {
-            await fetch('https://formspree.io/f/xjgledbb', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ name, email, message })
-            });
-        } catch (e) { 
-            console.error("Formspree background bypass warning:", e.message); 
-        }
-
-        res.status(201).json({ success: true, data: result.rows[0] });
-    } catch (err) {
-        res.status(500).json({ error: "Database error writing contact lead record." });
-    }
-});
-
-app.get('/api/messages', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM messages ORDER BY created_at DESC');
-        res.json(result.rows);
-    } catch (err) {
-        res.status(500).json({ error: "Error fetching lead tables." });
-    }
-});
-
-
-/* ==========================================================================
-   SERVER RUNTIME INITIALIZATION
-   ========================================================================== */
+// ====================== START SERVER ======================
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`JoyTech Portfolio running securely on Port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });

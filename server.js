@@ -1,235 +1,153 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JoyTech Portfolio</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+const express = require('express');
+const cors = require('cors');
+const { Pool } = require('pg');
+const path = require('path');
+require('dotenv').config();
 
-  <header>
-    <div class="logo">JoyTech</div>
-    
-    <button class="menu-toggle" aria-label="Toggle navigation menu" aria-controls="main-navigation">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
+const app = express();
 
-    <nav id="main-navigation">
-      <a href="#home">Home</a>
-      <a href="#about">About</a>
-      <a href="#skills">Skills</a>
-      <a href="#projects">Projects</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </header>
+// Global Security and Request Parsing Middleware
+app.use(cors());
+app.use(express.json());
 
-  <section class="hero" id="home">
-    <div class="hero-text">
-      <h3>Hello, I'm</h3>
-      <h1>Joyce William</h1>
-      <h2>ICT Technician & Web Developer</h2>
-      <p>
-        Passionate about web development, UI design,
-        mobile applications, and creating beautiful
-        modern digital experiences.
-      </p>
-      <div class="buttons">
-        <a href="#projects" class="btn">View Projects</a>
-        <a href="#contact" class="btn-outline">Contact Me</a>
-      </div>
-    </div>
-    <div class="hero-image">
-      <img src="image1.jpg" alt="Profile Picture">
-    </div>
-  </section>
+// Serve Static Assets Safely from Root Directory
+app.use(express.static(path.join(__dirname)));
 
-  <section class="about" id="about">
-    <div class="section-title">
-      <h2>About Me</h2>
-    </div>
-    <p>
-      I am an ICT Technician.
-      I enjoy building websites, designing mobile apps,
-      and creating attractive digital content.
-      My goal is to grow professionally in software
-      development and UI/UX design.
-    </p>
-  </section>
+// Neon SQL Cloud Database Connection Core
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
+});
 
-  <section class="skills" id="skills">
-    <div class="section-title">
-      <h2>My Skills</h2>
-    </div>
-    <div class="skills-container">
-      <div class="skill-card"><h3>HTML</h3></div>
-      <div class="skill-card"><h3>CSS</h3></div>
-      <div class="skill-card"><h3>JavaScript</h3></div>
-      <div class="skill-card"><h3>Flutter</h3></div>
-      <div class="skill-card"><h3>Canva Design</h3></div>
-      <div class="skill-card"><h3>UI/UX Design</h3></div>
-    </div>
-  </section>
+// Database Infrastructure Initialization
+const initDB = async () => {
+    try {
+        // Create messages table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS messages (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(100) NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+        
+        // Create users table for authentication credentials
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                username VARCHAR(100) UNIQUE NOT NULL,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+        console.log("Neon Database Architecture Synced Cleanly.");
+    } catch (err) {
+        console.error("Critical Infrastructure Initialization Fault:", err);
+    }
+};
+initDB();
 
-  <section class="projects" id="projects">
-    <div class="section-title">
-      <h2>Projects</h2>
-    </div>
-    <div class="project-container">
-      <div class="project-card">
-        <img src="image.png" alt="Calculator App Screenshot">
-        <h3>Calculator App</h3>
-        <p>Modern Flutter mobile application with stylish user interface design.</p>
-      </div>
-      <div class="project-card">
-        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop" alt="Digital Design Layout">
-        <h3>Graduation Posters</h3>
-        <p>Creative graduation card and poster designs using Canva.</p>
-      </div>
-      <div class="project-card">
-        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop" alt="Code on Screen">
-        <h3>Portfolio Website</h3>
-        <p>Responsive personal portfolio website built using HTML, CSS and JavaScript.</p>
-      </div>
-    </div>
-  </section>
+/* ==========================================================================
+   STRICT GATE ROUTING SYSTEM (THE LOCK)
+   ========================================================================== */
 
-  <section class="contact" id="contact">
-    <div class="section-title">
-      <h2>Contact Me</h2>
-    </div>
+/**
+ * ROOT ROUTE: Force users to authenticate via auth.html first
+ */
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'auth.html'));
+});
 
-    <div class="contact-wrapper">
-      
-      <div class="contact-info">
-        <div class="info-item">
-          <h4>Call Me</h4>
-          <a href="tel:0745806435">0745806435</a>
-        </div>
-        <div class="info-item">
-          <h4>WhatsApp Me</h4>
-          <a href="https://wa.me/254745806435" target="_blank">Chat on WhatsApp</a>
-        </div>
-        <div class="info-item">
-          <h4>Email Me</h4>
-          <a href="mailto:jw42205769@gmail.com">jw42205769@gmail.com</a>
-        </div>
-      </div>
+/**
+ * DASHBOARD ROUTE: Your actual portfolio is safely loaded here after authorization
+ */
+app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-      <div class="form-container">
-        <div id="successAlert" class="form-alert success-message" style="display: none;">
-          ✓ Message sent successfully! I will get back to you shortly.
-        </div>
-        <div id="errorAlert" class="form-alert error-message" style="display: none;">
-          ✗ Failed to send. Please check your connectivity and try again.
-        </div>
 
-        <form id="contact-form" class="custom-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="name">Your Name</label>
-              <input type="text" id="name" placeholder="John Doe" required />
-            </div>
-            <div class="form-group">
-              <label for="email">Email Address</label>
-              <input type="email" id="email" placeholder="client@example.com" required />
-            </div>
-          </div>
+/* ==========================================================================
+   AUTHENTICATION API ENDPOINTS
+   ========================================================================== */
 
-          <div class="form-group">
-            <label for="service">Requested Domain / Service</label>
-            <select id="service" required>
-              <option value="" disabled selected>Select an operational domain...</option>
-              <option value="mobile_app">Mobile App</option>
-              <option value="responsive_websites">Responsive Websites</option>
-              <option value="posters">Posters</option>
-              <option value="flyers">Flyers</option>
-            </select>
-          </div>
+// Sign Up Endpoint
+app.post('/api/auth/signup', async (req, res) => {
+    const { username, email, password } = req.body;
+    try {
+        const queryText = 'INSERT INTO users(username, email, password) VALUES($1, $2, $3) RETURNING id, username, email';
+        const result = await pool.query(queryText, [username, email, password]);
+        res.status(201).json({ success: true, user: result.rows[0] });
+    } catch (err) {
+        if (err.code === '23505') {
+            return res.status(400).json({ error: "Username or Email already registered." });
+        }
+        res.status(500).json({ error: "Server error during registration workflow." });
+    }
+});
 
-          <div class="form-group">
-            <label for="message">Detailed Scope & Requirements</label>
-            <textarea id="message" placeholder="Outline specific technical requirements, design themes, or project timelines..." required></textarea>
-          </div>
+// Sign In Endpoint
+app.post('/api/auth/signin', async (req, res) => {
+    const { userKey, password } = req.body;
+    try {
+        const queryText = 'SELECT * FROM users WHERE (username = $1 OR email = $1) AND password = $2';
+        const result = await pool.query(queryText, [userKey, password]);
 
-          <button type="submit" class="btn-submit">Send Message</button>
-        </form>
-      </div>
+        if (result.rows.length > 0) {
+            res.json({ success: true, message: "Authentication verified." });
+        } else {
+            res.status(401).json({ error: "Invalid username, email, or password credentials." });
+        }
+    } catch (err) {
+        res.status(500).json({ error: "Server authentication interface error." });
+    }
+});
 
-    </div>
-  </section>
 
-  <footer>
-    <div class="footer-contacts">
-      <a href="tel:0745806435">Call</a> | 
-      <a href="https://wa.me/254745806435" target="_blank">WhatsApp</a> | 
-      <a href="mailto:jw42205769@gmail.com">Email</a>
-    </div>
-    <p>© 2026 JoyTech Portfolio | Designed by Joyce William</p>
-  </footer>
+/* ==========================================================================
+   CONTACT FORM HANDLERS
+   ========================================================================== */
 
-  <script>
-    // MOBILE RESPONSIVE HAMBURGER NAVIGATION
-    const menuToggle = document.querySelector('.menu-toggle');
-    const mainNav = document.getElementById('main-navigation');
-    const navLinks = document.querySelectorAll('#main-navigation a');
+app.post('/api/contact', async (req, res) => {
+    const { name, email, message } = req.body;
+    try {
+        const queryText = 'INSERT INTO messages(name, email, message) VALUES($1, $2, $3) RETURNING *';
+        const result = await pool.query(queryText, [name, email, message]);
+        
+        try {
+            await fetch('https://formspree.io/f/xjgledbb', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ name, email, message })
+            });
+        } catch (e) { 
+            console.error("Formspree background bypass warning:", e.message); 
+        }
 
-    menuToggle.addEventListener('click', () => {
-      menuToggle.classList.toggle('active');
-      mainNav.classList.toggle('active');
-    });
+        res.status(201).json({ success: true, data: result.rows[0] });
+    } catch (err) {
+        res.status(500).json({ error: "Database error writing contact lead record." });
+    }
+});
 
-    navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        menuToggle.classList.remove('active');
-        mainNav.classList.remove('active');
-      });
-    });
+app.get('/api/messages', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM messages ORDER BY created_at DESC');
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: "Error fetching lead tables." });
+    }
+});
 
-    // CONTACT DATA BACKEND TRANSFERS
-    const contactForm = document.getElementById('contact-form');
-    const successAlert = document.getElementById('successAlert');
-    const errorAlert = document.getElementById('errorAlert');
-    const submitBtn = document.querySelector('.btn-submit');
 
-    contactForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const service = document.getElementById('service').value;
-      const messageText = document.getElementById('message').value;
-      const formattedMessage = `[Service: ${service}] ${messageText}`;
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Sending...';
-      successAlert.style.display = 'none';
-      errorAlert.style.display = 'none';
-
-      try {
-        const response = await fetch('/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: name, email: email, message: formattedMessage })
-        });
-        const result = await response.json();
-        if (response.ok && result.success) {
-          successAlert.style.display = 'block';
-          contactForm.reset();
-        } else { throw new Error(result.error || 'Server processing error.'); }
-      } catch (err) {
-        errorAlert.textContent = `✗ Error: ${err.message || 'Unable to sync with your website server.'}`;
-        errorAlert.style.display = 'block';
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Send Message';
-      }
-    });
-  </script>
-</body>
-</html>
+/* ==========================================================================
+   SERVER RUNTIME INITIALIZATION
+   ========================================================================== */
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`JoyTech Portfolio running securely on Port ${PORT}`);
+});

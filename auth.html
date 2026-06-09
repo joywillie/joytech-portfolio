@@ -1,178 +1,102 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JoyTech | Secure Gateway</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
+<title>Auth</title>
 <style>
-body {
-  font-family: Poppins;
-  background: #0b1329;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.box {
-  width: 420px;
-  background: #111c3a;
-  padding: 25px;
-  border-radius: 12px;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  cursor: pointer;
-}
-
-.hidden { display: none; }
-
-.msg {
-  margin-top: 10px;
-  font-size: 14px;
-}
-
-.success { color: lightgreen; }
-.error { color: red; }
-
-.switch {
-  margin-top: 10px;
-  cursor: pointer;
-  color: gold;
-}
+body{font-family:Arial;background:#0b1329;color:white;display:flex;justify-content:center;align-items:center;height:100vh}
+.box{background:#111c3a;padding:20px;width:350px}
+input,button{width:100%;padding:10px;margin:5px 0}
+.hidden{display:none}
+.msg{margin:5px 0}
 </style>
 </head>
-
 <body>
 
 <div class="box">
 
-<h2>JoyTech Auth</h2>
+<div id="msg"></div>
 
-<div id="msg" class="msg"></div>
-
-<!-- LOGIN -->
 <div id="loginBox">
-  <input id="loginUser" placeholder="Username or Email">
-  <input id="loginPass" type="password" placeholder="Password">
-  <button id="loginBtn">Login</button>
-  <div class="switch" onclick="showSignup()">Create account</div>
+<input id="loginUser" placeholder="Username/email">
+<input id="loginPass" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p onclick="showSignup()">Signup</p>
 </div>
 
-<!-- SIGNUP -->
 <div id="signupBox" class="hidden">
-  <input id="signupUser" placeholder="Username">
-  <input id="signupEmail" placeholder="Email">
-  <input id="signupPass" type="password" placeholder="Password">
-  <button id="signupBtn">Sign Up</button>
-  <div class="switch" onclick="showLogin()">Back to login</div>
+<input id="signupUser" placeholder="Username">
+<input id="signupEmail" placeholder="Email">
+<input id="signupPass" type="password" placeholder="Password">
+<button onclick="signup()">Signup</button>
+<p onclick="showLogin()">Login</p>
 </div>
 
 </div>
 
 <script>
-console.log("AUTH LOADED");
 
-// ELEMENTS
 const msg = document.getElementById("msg");
 
-// SWITCH UI
-function showSignup() {
-  document.getElementById("loginBox").classList.add("hidden");
-  document.getElementById("signupBox").classList.remove("hidden");
+function showSignup(){
+  loginBox.classList.add("hidden");
+  signupBox.classList.remove("hidden");
 }
 
-function showLogin() {
-  document.getElementById("signupBox").classList.add("hidden");
-  document.getElementById("loginBox").classList.remove("hidden");
+function showLogin(){
+  signupBox.classList.add("hidden");
+  loginBox.classList.remove("hidden");
 }
 
-// ===================== SIGNUP =====================
-document.getElementById("signupBtn").addEventListener("click", async () => {
-  try {
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: signupUser.value,
-        email: signupEmail.value,
-        password: signupPass.value
-      })
-    });
+// SIGNUP
+async function signup(){
+  const res = await fetch("/api/auth/signup",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      username:signupUser.value,
+      email:signupEmail.value,
+      password:signupPass.value
+    })
+  });
 
-    const data = await res.json();
+  const data = await res.json();
 
-    if (!res.ok) throw new Error(data.error || "Signup failed");
-
-    msg.className = "msg success";
-    msg.innerText = "Account created successfully!";
-
-    // CLEAR INPUTS
-    signupUser.value = "";
-    signupEmail.value = "";
-    signupPass.value = "";
-
-    setTimeout(() => {
-      showLogin();
-    }, 1200);
-
-  } catch (err) {
-    msg.className = "msg error";
-    msg.innerText = err.message;
+  if(!res.ok){
+    msg.innerText=data.error;
+    return;
   }
-});
 
-// ===================== LOGIN =====================
-document.getElementById("loginBtn").addEventListener("click", async () => {
-  try {
-    const res = await fetch("/api/auth/signin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userKey: loginUser.value,
-        password: loginPass.value
-      })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.error || "Login failed");
-
-    if (!data.token) throw new Error("No token received");
-
-    // SAVE SESSION
-    localStorage.setItem("token", data.token);
-
-    msg.className = "msg success";
-    msg.innerText = "Login successful! Redirecting...";
-
-    setTimeout(() => {
-      window.location.href = "/dashboard";
-    }, 1000);
-
-  } catch (err) {
-    msg.className = "msg error";
-    msg.innerText = err.message;
-  }
-});
-
-// ===================== AUTO LOGIN CHECK =====================
-if (localStorage.getItem("token")) {
-  window.location.href = "/dashboard";
+  msg.innerText="Signup success";
+  showLogin();
 }
+
+// LOGIN
+async function login(){
+  const res = await fetch("/api/auth/signin",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      userKey:loginUser.value,
+      password:loginPass.value
+    })
+  });
+
+  const data = await res.json();
+
+  if(!res.ok){
+    msg.innerText=data.error;
+    return;
+  }
+
+  localStorage.setItem("token",data.token);
+  window.location.href="/dashboard";
+}
+
+// AUTO CHECK
+if(localStorage.getItem("token")){
+  window.location.href="/dashboard";
+}
+
 </script>
 
 </body>

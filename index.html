@@ -175,7 +175,7 @@
   </footer>
 
   <script>
-    // 1. MOBILE RESPONSIVE NAVIGATION CONTROL
+    // 1. MOBILE RESPONSIVE HAMBURGER NAVIGATION DRAWER SYSTEM
     const menuToggle = document.querySelector('.menu-toggle');
     const mainNav = document.getElementById('main-navigation');
     const navLinks = document.querySelectorAll('#main-navigation a');
@@ -185,7 +185,6 @@
       mainNav.classList.toggle('active');
     });
 
-    // Auto-closes sidebar drawer panel when user clicks an option link
     navLinks.forEach(link => {
       link.addEventListener('click', () => {
         menuToggle.classList.remove('active');
@@ -193,7 +192,7 @@
       });
     });
 
-    // 2. CONTACT DATA BACKEND TRANSFERS
+    // 2. FIXED CONTACT TRANSACTION ENGINE (ALIGNED TO NEON FORMATTING)
     const contactForm = document.getElementById('contact-form');
     const successAlert = document.getElementById('successAlert');
     const errorAlert = document.getElementById('errorAlert');
@@ -207,10 +206,9 @@
       const service = document.getElementById('service').value;
       const messageText = document.getElementById('message').value;
 
-      // Unifies layout selection tags with raw input strings inside database
-      const message = `[Service: ${service}] ${messageText}`;
+      // Formatting the payload data structure explicitly for your backend columns
+      const formattedMessage = `[Service: ${service}] ${messageText}`;
 
-      // Loading state setups
       submitBtn.disabled = true;
       submitBtn.textContent = 'Sending...';
       successAlert.style.display = 'none';
@@ -219,10 +217,12 @@
       try {
         const response = await fetch('/api/contact', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ name, email, message })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            name: name, 
+            email: email, 
+            message: formattedMessage  // Correctly mapping to your backend database columns
+          })
         });
 
         const result = await response.json();
@@ -234,7 +234,7 @@
           throw new Error(result.error || 'Server processing error.');
         }
       } catch (err) {
-        console.error('Submission handling trace:', err);
+        console.error(err);
         errorAlert.textContent = `✗ Error: ${err.message || 'Unable to sync with your website server.'}`;
         errorAlert.style.display = 'block';
       } finally {

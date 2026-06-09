@@ -19,7 +19,7 @@ body {
 }
 
 .box {
-  width: 400px;
+  width: 420px;
   background: #111c3a;
   padding: 25px;
   border-radius: 12px;
@@ -44,6 +44,7 @@ button {
   margin-top: 10px;
   font-size: 14px;
 }
+
 .success { color: lightgreen; }
 .error { color: red; }
 
@@ -85,6 +86,9 @@ button {
 <script>
 console.log("AUTH LOADED");
 
+// ELEMENTS
+const msg = document.getElementById("msg");
+
 // SWITCH UI
 function showSignup() {
   document.getElementById("loginBox").classList.add("hidden");
@@ -96,14 +100,12 @@ function showLogin() {
   document.getElementById("loginBox").classList.remove("hidden");
 }
 
-const msg = document.getElementById("msg");
-
-// SIGNUP
+// ===================== SIGNUP =====================
 document.getElementById("signupBtn").addEventListener("click", async () => {
   try {
     const res = await fetch("/api/auth/signup", {
       method: "POST",
-      headers: {"Content-Type":"application/json"},
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: signupUser.value,
         email: signupEmail.value,
@@ -113,11 +115,19 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
 
     const data = await res.json();
 
-    if (!res.ok) throw new Error(data.error);
+    if (!res.ok) throw new Error(data.error || "Signup failed");
 
     msg.className = "msg success";
-    msg.innerText = "Account created! Please login.";
-    showLogin();
+    msg.innerText = "Account created successfully!";
+
+    // CLEAR INPUTS
+    signupUser.value = "";
+    signupEmail.value = "";
+    signupPass.value = "";
+
+    setTimeout(() => {
+      showLogin();
+    }, 1200);
 
   } catch (err) {
     msg.className = "msg error";
@@ -125,12 +135,12 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
   }
 });
 
-// LOGIN
+// ===================== LOGIN =====================
 document.getElementById("loginBtn").addEventListener("click", async () => {
   try {
     const res = await fetch("/api/auth/signin", {
       method: "POST",
-      headers: {"Content-Type":"application/json"},
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userKey: loginUser.value,
         password: loginPass.value
@@ -139,8 +149,11 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 
     const data = await res.json();
 
-    if (!res.ok) throw new Error(data.error);
+    if (!res.ok) throw new Error(data.error || "Login failed");
 
+    if (!data.token) throw new Error("No token received");
+
+    // SAVE SESSION
     localStorage.setItem("token", data.token);
 
     msg.className = "msg success";
@@ -156,7 +169,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
   }
 });
 
-// AUTO CHECK LOGIN
+// ===================== AUTO LOGIN CHECK =====================
 if (localStorage.getItem("token")) {
   window.location.href = "/dashboard";
 }

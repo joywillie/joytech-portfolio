@@ -3,103 +3,260 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JoyTech - Website Portal Lock</title>
+  <title>JoyTech | Secure Gateway</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-    body { background-color: #0b1329; color: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    
-    .lock-container { width: 100%; max-width: 450px; background-color: #111c3a; border-radius: 12px; padding: 40px 35px; border-top: 4px solid #1d4ed8; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
-    .lock-header { text-align: center; margin-bottom: 30px; }
-    .lock-header h1 { color: #fbbf24; font-size: 26px; font-weight: 700; margin-bottom: 5px; }
-    .lock-header p { color: #94a3b8; font-size: 14px; }
-    
-    .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-    .form-group label { font-size: 14px; color: #94a3b8; }
-    .form-group input { background: #0b1329; border: 1px solid #1d4ed8; padding: 12px; border-radius: 6px; color: #ffffff; font-size: 15px; outline: none; }
-    .form-group input:focus { border-color: #fbbf24; }
-    
-    .btn-lock { background-color: #1d4ed8; color: #ffffff; border: none; padding: 12px; border-radius: 6px; font-weight: 600; font-size: 16px; cursor: pointer; width: 100%; transition: all 0.3s; }
-    .btn-lock:hover { background-color: #fbbf24; color: #0b1329; }
-    
-    .panel-toggle { text-align: center; margin-top: 20px; font-size: 14px; color: #94a3b8; }
-    .panel-toggle span { color: #fbbf24; cursor: pointer; text-decoration: underline; }
-    
-    .hidden-panel { display: none !important; }
-    .status-banner { padding: 12px; border-radius: 6px; font-size: 14px; margin-bottom: 20px; font-weight: 500; text-align: center; display: none; }
-    .success { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; }
-    .error { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
+    /* Global Reset & Theme Variables */
+    :root {
+      --bg-deep: #0b1329;
+      --panel-bg: rgba(17, 28, 58, 0.75);
+      --accent-blue: #1d4ed8;
+      --accent-glow: #3b82f6;
+      --text-gold: #fbbf24;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at center, #1e293b 0%, var(--bg-deep) 100%);
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    /* Glassmorphism Portal Card */
+    .portal-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(29, 78, 216, 0.25);
+      border-radius: 20px;
+      padding: 45px 35px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      transform: translateY(0);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .portal-card:hover {
+      border-color: rgba(59, 130, 246, 0.5);
+      box-shadow: 0 30px 60px -10px rgba(29, 78, 216, 0.25);
+    }
+
+    /* Header Styling */
+    .portal-header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .portal-header .logo {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-gold);
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      text-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+    }
+
+    .portal-header p {
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 300;
+    }
+
+    /* Form Fields Styling */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .form-group input {
+      background: rgba(11, 19, 41, 0.6);
+      border: 1.5px solid rgba(29, 78, 216, 0.4);
+      padding: 14px 16px;
+      border-radius: 10px;
+      color: #ffffff;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+      border-color: var(--accent-glow);
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+      background: rgba(11, 19, 41, 0.9);
+    }
+
+    /* Premium Button Style */
+    .btn-portal {
+      background: linear-gradient(135deg, var(--accent-blue) 0%, #1e40af 100%);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(29, 78, 216, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .btn-portal:hover {
+      background: linear-gradient(135deg, #2563eb 0%, var(--accent-blue) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-portal:active {
+      transform: translateY(0);
+    }
+
+    /* Footer Navigation Option Toggle */
+    .portal-switch {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .portal-switch span {
+      color: var(--text-gold);
+      font-weight: 500;
+      cursor: pointer;
+      margin-left: 5px;
+      transition: color 0.2s ease;
+    }
+
+    .portal-switch span:hover {
+      color: #fcd34d;
+      text-decoration: underline;
+    }
+
+    /* Utilities & Visibility States */
+    .hidden-view {
+      display: none !important;
+    }
+
+    /* Clean Status Alert Banners */
+    .status-banner {
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 24px;
+      text-align: center;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .success {
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .error {
+      background: rgba(239, 68, 68, 0.12);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
 
-  <div class="lock-container">
-    <div class="lock-header">
-      <h1>JoyTech Portal</h1>
-      <p id="lockDesc">Create an account to unlock the website</p>
+  <div class="portal-card">
+    <div class="portal-header">
+      <div class="logo">JoyTech</div>
+      <p id="portalDesc">Create your account to unlock access</p>
     </div>
 
-    <div id="notifier" class="status-banner"></div>
+    <div id="notifier" class="status-banner" style="display: none;"></div>
 
-    <!-- STEP 1: SIGN UP FORM (SHOWN FIRST) -->
-    <div id="signupStep">
+    <div id="signupBox">
       <form id="signupForm">
         <div class="form-group">
-          <label>Username</label>
-          <input type="text" id="regUser" placeholder="Choose a username" required />
+          <label for="regUser">Username</label>
+          <input type="text" id="regUser" placeholder="Choose username" autocomplete="username" required />
         </div>
         <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" id="regEmail" placeholder="name@example.com" required />
+          <label for="regEmail">Email Address</label>
+          <input type="email" id="regEmail" placeholder="yourname@example.com" autocomplete="email" required />
         </div>
         <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="regPass" placeholder="••••••••" required />
+          <label for="regPass">Password</label>
+          <input type="password" id="regPass" placeholder="••••••••" autocomplete="new-password" required />
         </div>
-        <button type="submit" class="btn-lock">Step 1: Create Account</button>
+        <button type="submit" class="btn-portal">Register Account</button>
       </form>
-      <div class="panel-toggle">Already have an account? <span onclick="showLogin()">Log In</span></div>
+      <div class="portal-switch">Already registered? <span onclick="switchToLogin()">Sign In</span></div>
     </div>
 
-    <!-- STEP 2: LOGIN FORM (HIDDEN UNTIL SIGNUP IS DONE) -->
-    <div id="loginStep" class="hidden-panel">
+    <div id="loginBox" class="hidden-view">
       <form id="loginForm">
         <div class="form-group">
-          <label>Username or Email</label>
-          <input type="text" id="logUser" placeholder="Enter username or email" required />
+          <label for="logUser">Username or Email</label>
+          <input type="text" id="logUser" placeholder="Enter username or email" autocomplete="username" required />
         </div>
         <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="logPass" placeholder="••••••••" required />
+          <label for="logPass">Password</label>
+          <input type="password" id="logPass" placeholder="••••••••" autocomplete="current-password" required />
         </div>
-        <button type="submit" class="btn-lock">Step 2: Unlock Website</button>
+        <button type="submit" class="btn-portal">Secure Unlock</button>
       </form>
-      <div class="panel-toggle">Need an account? <span onclick="showSignup()">Sign Up</span></div>
+      <div class="portal-switch">First time visiting? <span onclick="switchToSignup()">Create Account</span></div>
     </div>
   </div>
 
   <script>
     const notifier = document.getElementById('notifier');
-    const signupStep = document.getElementById('signupStep');
-    const loginStep = document.getElementById('loginStep');
-    const lockDesc = document.getElementById('lockDesc');
+    const signupBox = document.getElementById('signupBox');
+    const loginBox = document.getElementById('loginBox');
+    const portalDesc = document.getElementById('portalDesc');
 
-    function showLogin() {
-      signupStep.classList.add('hidden-panel');
-      loginStep.classList.remove('hidden-panel');
-      lockDesc.textContent = "Log in to verify identity";
+    function switchToLogin() {
+      signupBox.classList.add('hidden-view');
+      loginBox.classList.remove('hidden-view');
+      portalDesc.textContent = "Sign in to authenticate identity";
       notifier.style.display = 'none';
     }
 
-    function showSignup() {
-      loginStep.classList.add('hidden-panel');
-      signupStep.classList.remove('hidden-panel');
-      lockDesc.textContent = "Create an account to unlock the website";
+    function switchToSignup() {
+      loginBox.classList.add('hidden-view');
+      signupBox.classList.remove('hidden-view');
+      portalDesc.textContent = "Create your account to unlock access";
       notifier.style.display = 'none';
     }
 
-    // 1. Handle Account Creation -> Directs cleanly to Login step
+    // Pipeline 1: Process Registration Form Data Input strings
     document.getElementById('signupForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       notifier.style.display = 'none';
@@ -117,12 +274,12 @@
         const result = await response.json();
 
         if (response.ok) {
-          notifier.textContent = "✓ Account created successfully! Proceed to login.";
+          notifier.textContent = "✓ Account setup complete! Preparing lock screen...";
           notifier.className = "status-banner success";
           notifier.style.display = "block";
           
-          // Instantly switch out forms to the log in step
-          setTimeout(() => { showLogin(); }, 1500);
+          // Smooth structural visual window transitions
+          setTimeout(() => { switchToLogin(); }, 1400);
         } else {
           throw new Error(result.error);
         }
@@ -133,7 +290,7 @@
       }
     });
 
-    // 2. Handle Login Verification -> Redirects straight into your website
+    // Pipeline 2: Process Credential Identity Verification matches
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       notifier.style.display = 'none';
@@ -150,11 +307,11 @@
         const result = await response.json();
 
         if (response.ok) {
-          notifier.textContent = "✓ Access granted! Unlocking website...";
+          notifier.textContent = "✓ Authorization verification verified. Unlocking dashboard...";
           notifier.className = "status-banner success";
           notifier.style.display = "block";
 
-          // Directs user to the now hidden portfolio segment
+          // Route pipeline jump directly into main index website page
           setTimeout(() => { window.location.href = '/dashboard'; }, 1200);
         } else {
           throw new Error(result.error);

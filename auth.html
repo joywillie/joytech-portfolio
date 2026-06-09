@@ -3,7 +3,7 @@
 <head>
 <title>Auth</title>
 <style>
-body{font-family:Arial;background:#0b1329;color:white;display:flex;justify-content:center;align-items:center;height:100vh}
+body{font-family:Arial;background:#0b1329;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh}
 .box{background:#111c3a;padding:20px;width:350px}
 input,button{width:100%;padding:10px;margin:5px 0}
 .hidden{display:none}
@@ -62,11 +62,16 @@ async function signup(){
   const data = await res.json();
 
   if(!res.ok){
-    msg.innerText=data.error;
+    msg.innerText = data.error;
     return;
   }
 
-  msg.innerText="Signup success";
+  msg.innerText = "Signup success";
+
+  signupUser.value="";
+  signupEmail.value="";
+  signupPass.value="";
+
   showLogin();
 }
 
@@ -84,11 +89,17 @@ async function login(){
   const data = await res.json();
 
   if(!res.ok){
-    msg.innerText=data.error;
+    msg.innerText = data.error;
     return;
   }
 
-  localStorage.setItem("token",data.token);
+  if(!data.token){
+    msg.innerText = "No token received";
+    return;
+  }
+
+  localStorage.setItem("token", data.token);
+
   window.location.href="/dashboard";
 }
 

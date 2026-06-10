@@ -5,216 +5,342 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JoyTech | Secure Gateway</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-deep: #0b1329;
-      --panel-bg: rgba(17, 28, 58, 0.95);
-      --accent-blue: #1d4ed8;
-      --accent-glow: #3b82f6;
-      --text-gold: #fbbf24;
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --text: #f8fafc;
       --text-muted: #94a3b8;
+      --input-bg: #0f172a;
+      --border: #334155;
+      --error: #f87171;
+      --success: #4ade80;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
 
     body {
-      background: radial-gradient(circle at center, #1e293b 0%, var(--bg-deep) 100%);
-      color: #f1f5f9;
-      min-height: 100vh;
+      background-color: var(--bg-color);
+      color: var(--text);
       display: flex;
-      align-items: center;
       justify-content: center;
-      padding: 24px;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
     }
 
-    .portal-card {
+    .auth-container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 30px;
       width: 100%;
-      max-width: 440px;
-      background: var(--panel-bg);
-      border: 1px solid rgba(29, 78, 216, 0.25);
-      border-radius: 20px;
-      padding: 45px 35px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      max-width: 420px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      text-align: center;
     }
 
-    .portal-header { text-align: center; margin-bottom: 35px; }
-    .portal-header .logo { font-size: 32px; font-weight: 700; color: var(--text-gold); margin-bottom: 6px; }
-    .portal-header p { color: var(--text-muted); font-size: 14px; font-weight: 300; }
+    .brand-title {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #f59e0b;
+      margin-bottom: 5px;
+    }
 
-    .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; position: relative; }
-    .form-group label { font-size: 13px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; }
-    
+    .brand-subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 30px;
+    }
+
+    .status-banner {
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      display: none;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .status-banner.error {
+      background-color: rgba(248, 113, 113, 0.15);
+      border: 1px solid var(--error);
+      color: var(--error);
+    }
+
+    .status-banner.success {
+      background-color: rgba(74, 222, 128, 0.15);
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
     .form-group input {
-      background: rgba(11, 19, 41, 0.6);
-      border: 1.5px solid rgba(29, 78, 216, 0.4);
-      padding: 14px 16px;
-      border-radius: 10px;
-      color: #ffffff;
-      font-size: 15px;
-      outline: none;
       width: 100%;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
     }
-    .form-group input:focus { border-color: var(--accent-glow); box-shadow: 0 0 12px rgba(59, 130, 246, 0.3); }
 
-    .password-toggle {
-      position: absolute; right: 16px; bottom: 14px;
-      font-size: 12px; color: var(--text-muted); cursor: pointer; font-weight: 600;
-      user-select: none;
+    .form-group input:focus {
+      border-color: var(--accent);
     }
-    .password-toggle:hover { color: var(--text-gold); }
 
-    .btn-portal {
-      background: linear-gradient(135deg, var(--accent-blue) 0%, #1e40af 100%);
-      color: #ffffff; border: none; padding: 14px; border-radius: 10px;
-      font-weight: 600; font-size: 16px; cursor: pointer; width: 100%; transition: all 0.3s;
+    .pass-wrapper {
+      position: relative;
+    }
+
+    .toggle-pass {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .btn-action {
+      width: 100%;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
       margin-top: 10px;
     }
-    .btn-portal:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
 
-    .portal-switch { text-align: center; margin-top: 25px; font-size: 14px; color: var(--text-muted); }
-    .portal-switch span { color: var(--text-gold); font-weight: 500; cursor: pointer; margin-left: 5px; }
-    .portal-switch span:hover { text-decoration: underline; }
+    .btn-action:hover {
+      background-color: var(--accent-hover);
+    }
 
-    .hidden-view { display: none !important; }
+    .btn-action:disabled {
+      background-color: var(--border);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
 
-    .status-banner { padding: 14px; border-radius: 10px; font-size: 14px; font-weight: 500; margin-bottom: 24px; text-align: center; }
-    .success { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .error { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .switch-view-text {
+      margin-top: 25px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .switch-view-text span {
+      color: #f59e0b;
+      cursor: pointer;
+      font-weight: 500;
+      margin-left: 5px;
+    }
+
+    .switch-view-text span:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
 
-  <div class="portal-card">
-    <div class="portal-header">
-      <div class="logo">JoyTech</div>
-      <p id="portalDesc">Sign in to authenticate identity</p>
-    </div>
+  <div class="auth-container">
+    <div class="brand-title">JoyTech</div>
+    <div class="brand-subtitle" id="gateway-desc">Sign in to authenticate identity</div>
 
-    <div id="notifier" class="status-banner" style="display: none;"></div>
+    <div id="statusAlert" class="status-banner"></div>
 
-    <div id="loginBox">
-      <form id="loginForm">
-        <div class="form-group">
-          <label for="logUser">Username or Email</label>
-          <input type="text" id="logUser" placeholder="Enter username or email" required />
-        </div>
-        <div class="form-group">
-          <label for="logPass">Password</label>
-          <input type="password" id="logPass" placeholder="••••••••" required />
-          <span class="password-toggle" onclick="togglePassword('logPass', this)">SHOW</span>
-        </div>
-        <button type="submit" class="btn-portal">Secure Unlock</button>
-      </form>
-      <div class="portal-switch">First time visiting? <span onclick="switchToSignup()">Create Account</span></div>
-    </div>
+    <form id="auth-form">
+      <div id="form-fields-container"></div>
+      <button type="submit" id="submitBtn" class="btn-action">Secure Unlock</button>
+    </form>
 
-    <div id="signupBox" class="hidden-view">
-      <form id="signupForm">
-        <div class="form-group">
-          <label for="regUser">Username</label>
-          <input type="text" id="regUser" placeholder="Choose username" required />
-        </div>
-        <div class="form-group">
-          <label for="regEmail">Email Address</label>
-          <input type="email" id="regEmail" placeholder="yourname@example.com" required />
-        </div>
-        <div class="form-group">
-          <label for="regPass">Password</label>
-          <input type="password" id="regPass" placeholder="••••••••" required />
-          <span class="password-toggle" onclick="togglePassword('regPass', this)">SHOW</span>
-        </div>
-        <button type="submit" class="btn-portal">Register Account</button>
-      </form>
-      <div class="portal-switch">Already registered? <span onclick="switchToLogin()">Sign In</span></div>
+    <div class="switch-view-text" id="toggleModeContainer">
+      First time visiting? <span id="switchModeBtn">Create Account</span>
     </div>
   </div>
 
   <script>
-    const notifier = document.getElementById('notifier');
-    const signupBox = document.getElementById('signupBox');
-    const loginBox = document.getElementById('loginBox');
-    const portalDesc = document.getElementById('portalDesc');
+    // System Screen Mode State Controller
+    let isLoginMode = true;
 
-    function switchToLogin() {
-      signupBox.classList.add('hidden-view');
-      loginBox.classList.remove('hidden-view');
-      portalDesc.textContent = "Sign in to authenticate identity";
-      notifier.style.display = 'none';
-    }
+    const gatewayDesc = document.getElementById('gateway-desc');
+    const fieldsContainer = document.getElementById('form-fields-container');
+    const submitBtn = document.getElementById('submitBtn');
+    const switchModeBtn = document.getElementById('switchModeBtn');
+    const toggleModeContainer = document.getElementById('toggleModeContainer');
+    const statusAlert = document.getElementById('statusAlert');
+    const authForm = document.getElementById('auth-form');
 
-    function switchToSignup() {
-      loginBox.classList.add('hidden-view');
-      signupBox.classList.remove('hidden-view');
-      portalDesc.textContent = "Create your account to unlock access";
-      notifier.style.display = 'none';
-    }
-
-    function togglePassword(id, el) {
-      const input = document.getElementById(id);
-      if (input.type === "password") {
-        input.type = "text";
-        el.textContent = "HIDE";
+    // Multi-view layout manager
+    function buildFormLayout() {
+      statusAlert.style.display = 'none';
+      if (isLoginMode) {
+        gatewayDesc.textContent = "Sign in to authenticate identity";
+        submitBtn.textContent = "Secure Unlock";
+        toggleModeContainer.innerHTML = `First time visiting? <span id="switchModeBtn">Create Account</span>`;
+        
+        fieldsContainer.innerHTML = `
+          <div class="form-group">
+            <label for="userKey">Username or Email</label>
+            <input type="text" id="userKey" placeholder="Enter username or email" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="pass-wrapper">
+              <input type="password" id="password" placeholder="Enter security password" required />
+              <button type="button" class="toggle-pass" onclick="togglePasswordVisibility('password')">Show</button>
+            </div>
+          </div>
+        `;
       } else {
-        input.type = "password";
-        el.textContent = "SHOW";
+        gatewayDesc.textContent = "Create your account to unlock access";
+        submitBtn.textContent = "Register Account";
+        toggleModeContainer.innerHTML = `Already registered? <span id="switchModeBtn">Sign In Portal</span>`;
+        
+        fieldsContainer.innerHTML = `
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Choose a username" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="name@example.com" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="pass-wrapper">
+              <input type="password" id="password" placeholder="Create strong password" required />
+              <button type="button" class="toggle-pass" onclick="togglePasswordVisibility('password')">Show</button>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Wire up the click handler on the dynamically created text button
+      document.getElementById('switchModeBtn').addEventListener('click', () => {
+        isLoginMode = !isLoginMode;
+        buildFormLayout();
+      });
+    }
+
+    // Password view toggler
+    function togglePasswordVisibility(id) {
+      const field = document.getElementById(id);
+      const btn = field.nextElementSibling;
+      if (field.type === 'password') {
+        field.type = 'text';
+        btn.textContent = 'Hide';
+      } else {
+        field.type = 'password';
+        btn.textContent = 'Show';
       }
     }
 
-    // SIGNUP DATA HANDLING
-    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+    // API Submission router
+    authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      notifier.style.display = 'none';
+      
+      submitBtn.disabled = true;
+      statusAlert.style.display = 'none';
+
+      const targetUrl = isLoginMode ? '/api/auth/signin' : '/api/auth/signup';
+      let payload = {};
+
+      if (isLoginMode) {
+        payload = {
+          userKey: document.getElementById('userKey').value,
+          password: document.getElementById('password').value
+        };
+        submitBtn.textContent = "Verifying...";
+      } else {
+        payload = {
+          username: document.getElementById('username').value,
+          email: document.getElementById('email').value,
+          password: document.getElementById('password').value
+        };
+        submitBtn.textContent = "Creating Account...";
+      }
+
       try {
-        const response = await fetch('/api/auth/signup', {
+        const response = await fetch(targetUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: document.getElementById('regUser').value,
-            email: document.getElementById('regEmail').value,
-            password: document.getElementById('regPass').value
-          })
+          body: JSON.stringify(payload)
         });
-        const result = await response.json();
-        if (response.ok) {
-          notifier.textContent = "✓ Account setup complete! Switching to Sign In...";
-          notifier.className = "status-banner success";
-          notifier.style.display = "block";
-          setTimeout(() => { switchToLogin(); }, 1500);
-        } else { throw new Error(result.error || "Signup failed."); }
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          statusAlert.className = "status-banner success";
+          
+          if (isLoginMode) {
+            statusAlert.textContent = "✓ Authentication verified. Unlocking dashboard...";
+            statusAlert.style.display = 'block';
+            
+            // KEY STEP: Store the local authentication state flag!
+            localStorage.setItem('joytech_authenticated', 'true');
+            
+            setTimeout(() => {
+              window.location.replace('/dashboard');
+            }, 1000);
+          } else {
+            statusAlert.textContent = "✓ Account registered successfully! Accessing dashboard...";
+            statusAlert.style.display = 'block';
+            
+            // KEY STEP: Store the flag upon registration as well!
+            localStorage.setItem('joytech_authenticated', 'true');
+            
+            setTimeout(() => {
+              window.location.replace('/dashboard');
+            }, 1500);
+          }
+        } else {
+          throw new Error(data.error || (isLoginMode ? 'Login failed' : 'Signup failed'));
+        }
       } catch (err) {
-        notifier.textContent = `✗ ${err.message}`;
-        notifier.className = "status-banner error";
-        notifier.style.display = "block";
+        statusAlert.className = "status-banner error";
+        statusAlert.textContent = `✗ ${err.message}`;
+        statusAlert.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = isLoginMode ? "Secure Unlock" : "Register Account";
       }
     });
 
-    // SIGNIN DATA HANDLING
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      notifier.style.display = 'none';
-      try {
-        const response = await fetch('/api/auth/signin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userKey: document.getElementById('logUser').value,
-            password: document.getElementById('logPass').value
-          })
-        });
-        const result = await response.json();
-        if (response.ok) {
-          notifier.textContent = "✓ Access granted! Entering dashboard...";
-          notifier.className = "status-banner success";
-          notifier.style.display = "block";
-          setTimeout(() => { window.location.href = '/dashboard'; }, 1000);
-        } else { throw new Error(result.error || "Invalid credentials."); }
-      } catch (err) {
-        notifier.textContent = `✗ ${err.message}`;
-        notifier.className = "status-banner error";
-        notifier.style.display = "block";
-      }
-    });
+    // Run initialization mapping on load
+    buildFormLayout();
   </script>
 </body>
 </html>

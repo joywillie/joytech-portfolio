@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware configuration
+// Middleware rules
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
@@ -17,16 +17,14 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false }
 });
 
-// Automate dropping and rebuilding schema on boot setup
+// Drops old layout structures on start to ensure clean columns
 const initDB = async () => {
     try {
         console.log("Dropping old tables to ensure a clean slate...");
-        // DROPS THE OLD TABLES FIRST
         await pool.query('DROP TABLE IF EXISTS users CASCADE;');
         await pool.query('DROP TABLE IF EXISTS messages CASCADE;');
 
         console.log("Creating fresh database tables...");
-        // REBUILDS THE TABLES FRESH
         await pool.query(`
             CREATE TABLE users (
                 id SERIAL PRIMARY KEY,

@@ -193,18 +193,15 @@
   </div>
 
   <script>
-    // System Screen Mode State Controller
     let isLoginMode = true;
 
     const gatewayDesc = document.getElementById('gateway-desc');
     const fieldsContainer = document.getElementById('form-fields-container');
     const submitBtn = document.getElementById('submitBtn');
-    const switchModeBtn = document.getElementById('switchModeBtn');
     const toggleModeContainer = document.getElementById('toggleModeContainer');
     const statusAlert = document.getElementById('statusAlert');
     const authForm = document.getElementById('auth-form');
 
-    // Multi-view layout manager
     function buildFormLayout() {
       statusAlert.style.display = 'none';
       if (isLoginMode) {
@@ -249,14 +246,12 @@
         `;
       }
       
-      // Wire up the click handler on the dynamically created text button
       document.getElementById('switchModeBtn').addEventListener('click', () => {
         isLoginMode = !isLoginMode;
         buildFormLayout();
       });
     }
 
-    // Password view toggler
     function togglePasswordVisibility(id) {
       const field = document.getElementById(id);
       const btn = field.nextElementSibling;
@@ -269,7 +264,6 @@
       }
     }
 
-    // API Submission router
     authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -305,30 +299,17 @@
 
         if (response.ok && data.success) {
           statusAlert.className = "status-banner success";
+          statusAlert.textContent = isLoginMode ? "✓ Verified! Unlocking dashboard..." : "✓ Registered! Unlocking dashboard...";
+          statusAlert.style.display = 'block';
           
-          if (isLoginMode) {
-            statusAlert.textContent = "✓ Authentication verified. Unlocking dashboard...";
-            statusAlert.style.display = 'block';
-            
-            // KEY STEP: Store the local authentication state flag!
-            localStorage.setItem('joytech_authenticated', 'true');
-            
-            setTimeout(() => {
-              window.location.replace('/dashboard');
-            }, 1000);
-          } else {
-            statusAlert.textContent = "✓ Account registered successfully! Accessing dashboard...";
-            statusAlert.style.display = 'block';
-            
-            // KEY STEP: Store the flag upon registration as well!
-            localStorage.setItem('joytech_authenticated', 'true');
-            
-            setTimeout(() => {
-              window.location.replace('/dashboard');
-            }, 1500);
-          }
+          // Save authorization state BEFORE forcing the route change
+          localStorage.setItem('joytech_authenticated', 'true');
+          
+          setTimeout(() => {
+            window.location.replace('/dashboard');
+          }, 800);
         } else {
-          throw new Error(data.error || (isLoginMode ? 'Login failed' : 'Signup failed'));
+          throw new Error(data.error || 'Authentication sequence failed.');
         }
       } catch (err) {
         statusAlert.className = "status-banner error";
@@ -339,7 +320,6 @@
       }
     });
 
-    // Run initialization mapping on load
     buildFormLayout();
   </script>
 </body>

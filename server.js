@@ -2,15 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
-const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const app = express();
+const JWT_SECRET = process.env.JWT_SECRET || 'joytech_secret_key_2026';
 
-// Core Middleware
+// Core Middleware Rules
 app.use(cors());
 app.use(express.json());
-app.use(cookieParser()); // Enables safe cookie session management
 app.use(express.static(path.join(__dirname)));
 
 // Neon PostgreSQL connection pool setup
@@ -19,15 +20,12 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false }
 });
 
-// Resets and prepares fresh database architecture on start
+// Setup fresh tables for users and messages
 const initDB = async () => {
     try {
-        console.log("Rebuilding fresh tables for a clean runtime environment...");
-        await pool.query('DROP TABLE IF EXISTS users CASCADE;');
-        await pool.query('DROP TABLE IF EXISTS messages CASCADE;');
-
+        console.log("Initializing database tables...");
         await pool.query(`
-            CREATE TABLE users (
+            CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
                 username VARCHAR(100) UNIQUE NOT NULL,
                 email VARCHAR(100) UNIQUE NOT NULL,
@@ -36,7 +34,7 @@ const initDB = async () => {
             );
         `);
         await pool.query(`
-            CREATE TABLE messages (
+            CREATE TABLE IF NOT EXISTS messages (
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(100) NOT NULL,
                 email VARCHAR(100) NOT NULL,
@@ -44,77 +42,76 @@ const initDB = async () => {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
-        console.log("Database tables synchronized perfectly.");
+        console.log("Database tables verified and ready.");
     } catch (err) {
-        console.error("Database sync error:", err.message);
+        console.error("Database status warning:", err.message);
     }
 };
 initDB();
 
-// BACKEND ROUTE GUARDS (Replaces unstable frontend window redirections)
+// GATEWAY ROUTING: Serves auth page by default
 app.get('/', (req, res) => {
-    // If already authenticated via cookie, send them straight to dashboard
-    if (req.cookies.joytech_session === 'true') {
-        return res.redirect('/dashboard');
-    }
     res.sendFile(path.join(__dirname, 'auth.html'));
 });
 
+// PORTFOLIO ROUTING: Protected dashboard access
 app.get('/dashboard', (req, res) => {
-    // Strictly blocks non-logged in traffic at the server level
-    if (req.cookies.joytech_session !== 'true') {
-        return res.redirect('/');
-    }
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// LOGOUT ROUTE (Clears session backend-side)
-app.get('/api/auth/logout', (req, res) => {
-    res.clearCookie('joytech_session');
-    res.redirect('/');
-});
+// --- AUTHENTICATION ENDPOINTS ---
 
-// SIGNUP ENDPOINT
+// SIGNUP PORTAL
 app.post('/api/auth/signup', async (req, res) => {
     const { username, email, password } = req.body;
     try {
+        // Securely hash user password before saving
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
         await pool.query(
             'INSERT INTO users(username, email, password) VALUES($1, $2, $3)',
-            [username, email, password]
+            [username, email, hashedPassword]
         );
-        // Set secure access cookie directly on registration success
-        res.cookie('joytech_session', 'true', { maxAge: 86400000, httpOnly: false });
-        res.status(201).json({ success: true });
+
+        // Generate instant login token
+        const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '24h' });
+        res.status(201).json({ success: true, token });
     } catch (err) {
         console.error("Signup error:", err);
         if (err.code === '23505') {
-            return res.status(400).json({ error: "Username or Email is already registered." });
+            return res.status(400).json({ error: "Username or Email already registered." });
         }
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Server registration error." });
     }
 });
 
-// SIGNIN ENDPOINT
+// SIGNIN PORTAL
 app.post('/api/auth/signin', async (req, res) => {
     const { userKey, password } = req.body;
     try {
         const result = await pool.query(
-            'SELECT * FROM users WHERE (username = $1 OR email = $1) AND password = $2',
-            [userKey, password]
+            'SELECT * FROM users WHERE username = $1 OR email = $1',
+            [userKey]
         );
+
         if (result.rows.length > 0) {
-            // Set secure access cookie directly on login success
-            res.cookie('joytech_session', 'true', { maxAge: 86400000, httpOnly: false });
-            res.json({ success: true });
-        } else {
-            res.status(401).json({ error: "Invalid credentials. Please try again." });
+            const user = result.rows[0];
+            // Compare encrypted password hashes
+            const isMatch = await bcrypt.compare(password, user.password);
+            
+            if (isMatch) {
+                const token = jwt.sign({ username: user.username }, JWT_SECRET, { expiresIn: '24h' });
+                return res.json({ success: true, token });
+            }
         }
+        res.status(401).json({ error: "Invalid username, email, or password." });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Server login error." });
     }
 });
 
-// CONTACT ME PROCESSING
+// BACKUP CONTACT PROCESSING
 app.post('/api/contact', async (req, res) => {
     const { name, email, message } = req.body;
     try {
@@ -127,5 +124,5 @@ app.post('/api/contact', async (req, res) => {
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server listening securely on port ${PORT}`);
+    console.log(`JoyTech Secured Engine running on Port ${PORT}`);
 });

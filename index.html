@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JoyTech Portfolio</title>
   
+  <script>
+    if (localStorage.getItem('joytech_authenticated') !== 'true') {
+      window.location.replace('/');
+    }
+  </script>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
@@ -27,6 +33,7 @@
       <a href="#skills">Skills</a>
       <a href="#projects">Projects</a>
       <a href="#contact">Contact</a>
+      <a href="#" id="logoutLink" style="color: #f87171; font-weight: 600; border: 1px solid #f87171; padding: 5px 12px; border-radius: 6px; margin-left: 10px; display: inline-block;">Log Out</a>
     </nav>
   </header>
 
@@ -175,7 +182,14 @@
   </footer>
 
   <script>
-    // 1. MOBILE RESPONSIVE NAVIGATION CONTROL
+    // 1. LOGOUT OPERATION SYSTEM
+    document.getElementById('logoutLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.removeItem('joytech_authenticated'); // Clears the access flag
+      window.location.replace('/'); // Redirects back to the login wall
+    });
+
+    // 2. MOBILE RESPONSIVE NAVIGATION CONTROL
     const menuToggle = document.querySelector('.menu-toggle');
     const mainNav = document.getElementById('main-navigation');
     const navLinks = document.querySelectorAll('#main-navigation a');
@@ -185,7 +199,6 @@
       mainNav.classList.toggle('active');
     });
 
-    // Auto-closes sidebar drawer panel when user clicks an option link
     navLinks.forEach(link => {
       link.addEventListener('click', () => {
         menuToggle.classList.remove('active');
@@ -193,7 +206,7 @@
       });
     });
 
-    // 2. CONTACT DATA BACKEND TRANSFERS
+    // 3. CONTACT DATA BACKEND TRANSFERS
     const contactForm = document.getElementById('contact-form');
     const successAlert = document.getElementById('successAlert');
     const errorAlert = document.getElementById('errorAlert');
@@ -207,10 +220,8 @@
       const service = document.getElementById('service').value;
       const messageText = document.getElementById('message').value;
 
-      // Unifies layout selection tags with raw input strings inside database
       const message = `[Service: ${service}] ${messageText}`;
 
-      // Loading state setups
       submitBtn.disabled = true;
       submitBtn.textContent = 'Sending...';
       successAlert.style.display = 'none';
@@ -219,9 +230,7 @@
       try {
         const response = await fetch('/api/contact', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, message })
         });
 

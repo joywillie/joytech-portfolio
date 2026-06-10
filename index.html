@@ -27,7 +27,6 @@
       <a href="#skills">Skills</a>
       <a href="#projects">Projects</a>
       <a href="#contact">Contact</a>
-      <a href="/" onclick="window.location.replace('/'); return false;" style="color: #f87171; font-weight: 600; border: 1px solid #f87171; padding: 5px 12px; border-radius: 6px; margin-left: 10px; display: inline-block;">Log Out</a>
     </nav>
   </header>
 
@@ -176,7 +175,7 @@
   </footer>
 
   <script>
-    // MOBILE RESPONSIVE HAMBURGER NAVIGATION
+    // 1. MOBILE RESPONSIVE NAVIGATION CONTROL
     const menuToggle = document.querySelector('.menu-toggle');
     const mainNav = document.getElementById('main-navigation');
     const navLinks = document.querySelectorAll('#main-navigation a');
@@ -186,6 +185,7 @@
       mainNav.classList.toggle('active');
     });
 
+    // Auto-closes sidebar drawer panel when user clicks an option link
     navLinks.forEach(link => {
       link.addEventListener('click', () => {
         menuToggle.classList.remove('active');
@@ -193,7 +193,7 @@
       });
     });
 
-    // CONTACT FORM SUBMISSIONS
+    // 2. CONTACT DATA BACKEND TRANSFERS
     const contactForm = document.getElementById('contact-form');
     const successAlert = document.getElementById('successAlert');
     const errorAlert = document.getElementById('errorAlert');
@@ -201,12 +201,16 @@
 
     contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+
       const name = document.getElementById('name').value;
       const email = document.getElementById('email').value;
       const service = document.getElementById('service').value;
       const messageText = document.getElementById('message').value;
-      const formattedMessage = `[Service: ${service}] ${messageText}`;
 
+      // Unifies layout selection tags with raw input strings inside database
+      const message = `[Service: ${service}] ${messageText}`;
+
+      // Loading state setups
       submitBtn.disabled = true;
       submitBtn.textContent = 'Sending...';
       successAlert.style.display = 'none';
@@ -215,15 +219,22 @@
       try {
         const response = await fetch('/api/contact', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: name, email: email, message: formattedMessage })
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, email, message })
         });
+
         const result = await response.json();
+
         if (response.ok && result.success) {
           successAlert.style.display = 'block';
           contactForm.reset();
-        } else { throw new Error(result.error || 'Server processing error.'); }
+        } else {
+          throw new Error(result.error || 'Server processing error.');
+        }
       } catch (err) {
+        console.error('Submission handling trace:', err);
         errorAlert.textContent = `✗ Error: ${err.message || 'Unable to sync with your website server.'}`;
         errorAlert.style.display = 'block';
       } finally {

@@ -1,326 +1,131 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JoyTech | Secure Gateway</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
-      --accent: #2563eb;
-      --accent-hover: #1d4ed8;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --input-bg: #0f172a;
-      --border: #334155;
-      --error: #f87171;
-      --success: #4ade80;
+const express = require('express');
+const cors = require('cors');
+const { Pool } = require('pg');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+require('dotenv').config();
+
+const app = express();
+
+// Core Middleware
+app.use(cors());
+app.use(express.json());
+app.use(cookieParser()); // Enables safe cookie session management
+app.use(express.static(path.join(__dirname)));
+
+// Neon PostgreSQL connection pool setup
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+});
+
+// Resets and prepares fresh database architecture on start
+const initDB = async () => {
+    try {
+        console.log("Rebuilding fresh tables for a clean runtime environment...");
+        await pool.query('DROP TABLE IF EXISTS users CASCADE;');
+        await pool.query('DROP TABLE IF EXISTS messages CASCADE;');
+
+        await pool.query(`
+            CREATE TABLE users (
+                id SERIAL PRIMARY KEY,
+                username VARCHAR(100) UNIQUE NOT NULL,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+        await pool.query(`
+            CREATE TABLE messages (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(100) NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+        console.log("Database tables synchronized perfectly.");
+    } catch (err) {
+        console.error("Database sync error:", err.message);
     }
+};
+initDB();
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Poppins', sans-serif;
+// BACKEND ROUTE GUARDS (Replaces unstable frontend window redirections)
+app.get('/', (req, res) => {
+    // If already authenticated via cookie, send them straight to dashboard
+    if (req.cookies.joytech_session === 'true') {
+        return res.redirect('/dashboard');
     }
+    res.sendFile(path.join(__dirname, 'auth.html'));
+});
 
-    body {
-      background-color: var(--bg-color);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+app.get('/dashboard', (req, res) => {
+    // Strictly blocks non-logged in traffic at the server level
+    if (req.cookies.joytech_session !== 'true') {
+        return res.redirect('/');
     }
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-    .auth-container {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 40px 30px;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-      text-align: center;
-    }
+// LOGOUT ROUTE (Clears session backend-side)
+app.get('/api/auth/logout', (req, res) => {
+    res.clearCookie('joytech_session');
+    res.redirect('/');
+});
 
-    .brand-title {
-      font-size: 2rem;
-      font-weight: 600;
-      color: #f59e0b;
-      margin-bottom: 5px;
-    }
-
-    .brand-subtitle {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      margin-bottom: 30px;
-    }
-
-    .status-banner {
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      margin-bottom: 20px;
-      display: none;
-      text-align: center;
-      font-weight: 500;
-    }
-
-    .status-banner.error {
-      background-color: rgba(248, 113, 113, 0.15);
-      border: 1px solid var(--error);
-      color: var(--error);
-    }
-
-    .status-banner.success {
-      background-color: rgba(74, 222, 128, 0.15);
-      border: 1px solid var(--success);
-      color: var(--success);
-    }
-
-    .form-group {
-      text-align: left;
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-      font-weight: 500;
-    }
-
-    .form-group input {
-      width: 100%;
-      background-color: var(--input-bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .form-group input:focus {
-      border-color: var(--accent);
-    }
-
-    .pass-wrapper {
-      position: relative;
-    }
-
-    .toggle-pass {
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      cursor: pointer;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .btn-action {
-      width: 100%;
-      background-color: var(--accent);
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      margin-top: 10px;
-    }
-
-    .btn-action:hover {
-      background-color: var(--accent-hover);
-    }
-
-    .btn-action:disabled {
-      background-color: var(--border);
-      color: var(--text-muted);
-      cursor: not-allowed;
-    }
-
-    .switch-view-text {
-      margin-top: 25px;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .switch-view-text span {
-      color: #f59e0b;
-      cursor: pointer;
-      font-weight: 500;
-      margin-left: 5px;
-    }
-
-    .switch-view-text span:hover {
-      text-decoration: underline;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="auth-container">
-    <div class="brand-title">JoyTech</div>
-    <div class="brand-subtitle" id="gateway-desc">Sign in to authenticate identity</div>
-
-    <div id="statusAlert" class="status-banner"></div>
-
-    <form id="auth-form">
-      <div id="form-fields-container"></div>
-      <button type="submit" id="submitBtn" class="btn-action">Secure Unlock</button>
-    </form>
-
-    <div class="switch-view-text" id="toggleModeContainer">
-      First time visiting? <span id="switchModeBtn">Create Account</span>
-    </div>
-  </div>
-
-  <script>
-    let isLoginMode = true;
-
-    const gatewayDesc = document.getElementById('gateway-desc');
-    const fieldsContainer = document.getElementById('form-fields-container');
-    const submitBtn = document.getElementById('submitBtn');
-    const toggleModeContainer = document.getElementById('toggleModeContainer');
-    const statusAlert = document.getElementById('statusAlert');
-    const authForm = document.getElementById('auth-form');
-
-    function buildFormLayout() {
-      statusAlert.style.display = 'none';
-      if (isLoginMode) {
-        gatewayDesc.textContent = "Sign in to authenticate identity";
-        submitBtn.textContent = "Secure Unlock";
-        toggleModeContainer.innerHTML = `First time visiting? <span id="switchModeBtn">Create Account</span>`;
-        
-        fieldsContainer.innerHTML = `
-          <div class="form-group">
-            <label for="userKey">Username or Email</label>
-            <input type="text" id="userKey" placeholder="Enter username or email" required />
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <div class="pass-wrapper">
-              <input type="password" id="password" placeholder="Enter security password" required />
-              <button type="button" class="toggle-pass" onclick="togglePasswordVisibility('password')">Show</button>
-            </div>
-          </div>
-        `;
-      } else {
-        gatewayDesc.textContent = "Create your account to unlock access";
-        submitBtn.textContent = "Register Account";
-        toggleModeContainer.innerHTML = `Already registered? <span id="switchModeBtn">Sign In Portal</span>`;
-        
-        fieldsContainer.innerHTML = `
-          <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" placeholder="Choose a username" required />
-          </div>
-          <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" placeholder="name@example.com" required />
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <div class="pass-wrapper">
-              <input type="password" id="password" placeholder="Create strong password" required />
-              <button type="button" class="toggle-pass" onclick="togglePasswordVisibility('password')">Show</button>
-            </div>
-          </div>
-        `;
-      }
-      
-      document.getElementById('switchModeBtn').addEventListener('click', () => {
-        isLoginMode = !isLoginMode;
-        buildFormLayout();
-      });
-    }
-
-    function togglePasswordVisibility(id) {
-      const field = document.getElementById(id);
-      const btn = field.nextElementSibling;
-      if (field.type === 'password') {
-        field.type = 'text';
-        btn.textContent = 'Hide';
-      } else {
-        field.type = 'password';
-        btn.textContent = 'Show';
-      }
-    }
-
-    authForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      submitBtn.disabled = true;
-      statusAlert.style.display = 'none';
-
-      const targetUrl = isLoginMode ? '/api/auth/signin' : '/api/auth/signup';
-      let payload = {};
-
-      if (isLoginMode) {
-        payload = {
-          userKey: document.getElementById('userKey').value,
-          password: document.getElementById('password').value
-        };
-        submitBtn.textContent = "Verifying...";
-      } else {
-        payload = {
-          username: document.getElementById('username').value,
-          email: document.getElementById('email').value,
-          password: document.getElementById('password').value
-        };
-        submitBtn.textContent = "Creating Account...";
-      }
-
-      try {
-        const response = await fetch(targetUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-          statusAlert.className = "status-banner success";
-          statusAlert.textContent = isLoginMode ? "✓ Verified! Unlocking dashboard..." : "✓ Registered! Unlocking dashboard...";
-          statusAlert.style.display = 'block';
-          
-          // Save authorization state BEFORE forcing the route change
-          localStorage.setItem('joytech_authenticated', 'true');
-          
-          setTimeout(() => {
-            window.location.replace('/dashboard');
-          }, 800);
-        } else {
-          throw new Error(data.error || 'Authentication sequence failed.');
+// SIGNUP ENDPOINT
+app.post('/api/auth/signup', async (req, res) => {
+    const { username, email, password } = req.body;
+    try {
+        await pool.query(
+            'INSERT INTO users(username, email, password) VALUES($1, $2, $3)',
+            [username, email, password]
+        );
+        // Set secure access cookie directly on registration success
+        res.cookie('joytech_session', 'true', { maxAge: 86400000, httpOnly: false });
+        res.status(201).json({ success: true });
+    } catch (err) {
+        console.error("Signup error:", err);
+        if (err.code === '23505') {
+            return res.status(400).json({ error: "Username or Email is already registered." });
         }
-      } catch (err) {
-        statusAlert.className = "status-banner error";
-        statusAlert.textContent = `✗ ${err.message}`;
-        statusAlert.style.display = 'block';
-        submitBtn.disabled = false;
-        submitBtn.textContent = isLoginMode ? "Secure Unlock" : "Register Account";
-      }
-    });
+        res.status(500).json({ error: err.message });
+    }
+});
 
-    buildFormLayout();
-  </script>
-</body>
-</html>
+// SIGNIN ENDPOINT
+app.post('/api/auth/signin', async (req, res) => {
+    const { userKey, password } = req.body;
+    try {
+        const result = await pool.query(
+            'SELECT * FROM users WHERE (username = $1 OR email = $1) AND password = $2',
+            [userKey, password]
+        );
+        if (result.rows.length > 0) {
+            // Set secure access cookie directly on login success
+            res.cookie('joytech_session', 'true', { maxAge: 86400000, httpOnly: false });
+            res.json({ success: true });
+        } else {
+            res.status(401).json({ error: "Invalid credentials. Please try again." });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// CONTACT ME PROCESSING
+app.post('/api/contact', async (req, res) => {
+    const { name, email, message } = req.body;
+    try {
+        await pool.query('INSERT INTO messages(name, email, message) VALUES($1, $2, $3)', [name, email, message]);
+        res.status(201).json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server listening securely on port ${PORT}`);
+});

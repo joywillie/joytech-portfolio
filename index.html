@@ -4,16 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JoyTech Portfolio</title>
-  
-  <script>
-    if (localStorage.getItem('joytech_authenticated') !== 'true') {
-      window.location.replace('/');
-    }
-  </script>
-  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -33,7 +25,7 @@
       <a href="#skills">Skills</a>
       <a href="#projects">Projects</a>
       <a href="#contact">Contact</a>
-      <a href="#" id="logoutLink" style="color: #f87171; font-weight: 600; border: 1px solid #f87171; padding: 5px 12px; border-radius: 6px; margin-left: 10px; display: inline-block;">Log Out</a>
+      <a href="/api/auth/logout" style="color: #f87171; font-weight: 600; border: 1px solid #f87171; padding: 5px 12px; border-radius: 6px; margin-left: 10px; display: inline-block;">Log Out</a>
     </nav>
   </header>
 
@@ -182,14 +174,7 @@
   </footer>
 
   <script>
-    // 1. LOGOUT OPERATION SYSTEM
-    document.getElementById('logoutLink').addEventListener('click', (e) => {
-      e.preventDefault();
-      localStorage.removeItem('joytech_authenticated'); // Clears the access flag
-      window.location.replace('/'); // Redirects back to the login wall
-    });
-
-    // 2. MOBILE RESPONSIVE NAVIGATION CONTROL
+    // NAVIGATION MENU INTERACTION
     const menuToggle = document.querySelector('.menu-toggle');
     const mainNav = document.getElementById('main-navigation');
     const navLinks = document.querySelectorAll('#main-navigation a');
@@ -206,7 +191,7 @@
       });
     });
 
-    // 3. CONTACT DATA BACKEND TRANSFERS
+    // CLIENT CONTACT API SYNC
     const contactForm = document.getElementById('contact-form');
     const successAlert = document.getElementById('successAlert');
     const errorAlert = document.getElementById('errorAlert');
@@ -214,12 +199,10 @@
 
     contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const name = document.getElementById('name').value;
       const email = document.getElementById('email').value;
       const service = document.getElementById('service').value;
       const messageText = document.getElementById('message').value;
-
       const message = `[Service: ${service}] ${messageText}`;
 
       submitBtn.disabled = true;
@@ -233,18 +216,15 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, message })
         });
-
         const result = await response.json();
-
         if (response.ok && result.success) {
           successAlert.style.display = 'block';
           contactForm.reset();
         } else {
-          throw new Error(result.error || 'Server processing error.');
+          throw new Error(result.error || 'Processing mismatch.');
         }
       } catch (err) {
-        console.error('Submission handling trace:', err);
-        errorAlert.textContent = `✗ Error: ${err.message || 'Unable to sync with your website server.'}`;
+        errorAlert.textContent = `✗ Error: ${err.message || 'Unable to communicate with the main instance.'}`;
         errorAlert.style.display = 'block';
       } finally {
         submitBtn.disabled = false;

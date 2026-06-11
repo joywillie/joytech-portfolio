@@ -1,34 +1,136 @@
-if(response.ok){
+const express = require("express");
+const cors = require("cors");
+const { Pool } = require("pg");
+const path = require("path");
+const bcrypt = require("bcryptjs");
+require("dotenv").config();
 
+const app = express();
 
-localStorage.setItem(
-"joytech_token",
-result.token
-);
+/* ================= MIDDLEWARE ================= */
+app.use(cors());
+app.use(express.json());
+app.use(express.static(__dirname));
 
+/* ================= DATABASE ================= */
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
 
-notifier.textContent=
-"✓ Login successful";
+/* ================= INIT DATABASE ================= */
+async function initDB() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
 
-
-notifier.className=
-"status-banner success";
-
-
-notifier.style.display="block";
-
-
-
-setTimeout(()=>{
-
-window.location.href="/dashboard";
-
-},1000);
-
-
-
-}else{
-
-throw new Error(result.error);
-
+    console.log("Users table ready ✔");
+  } catch (err) {
+    console.error("DB init error:", err);
+  }
 }
+initDB();
+
+/* ================= PAGES ================= */
+
+// LOGIN PAGE
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "auth.html"));
+});
+
+// AUTH PAGE (same login page)
+app.get("/auth", (req, res) => {
+  res.sendFile(path.join(__dirname, "auth.html"));
+});
+
+// DASHBOARD (PORTFOLIO)
+app.get("/dashboard", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+/* ================= SIGN UP ================= */
+app.post("/api/auth/signup", async (req, res) => {
+  const { username, email, password } = req.body;
+
+  if (!username || !email || !password) {
+    return res.status(400).json({ error: "All fields required" });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await pool.query(
+      `INSERT INTO users(username,email,password)
+       VALUES($1,$2,$3)
+       RETURNING id, username, email`,
+      [username.toLowerCase(), email.toLowerCase(), hashedPassword]
+    );
+
+    res.json({
+      success: true,
+      user: result.rows[0]
+    });
+
+  } catch (err) {
+    if (err.code === "23505") {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
+    res.status(500).json({ error: "Signup failed" });
+  }
+});
+
+/* ================= SIGN IN ================= */
+app.post("/api/auth/signin", async (req, res) => {
+  const { userKey, password } = req.body;
+
+  if (!userKey || !password) {
+    return res.status(400).json({ error: "Missing credentials" });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT * FROM users WHERE username=$1 OR email=$1`,
+      [userKey.toLowerCase()]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
+    const user = result.rows[0];
+
+    const match = await bcrypt.compare(password, user.password);
+
+    if (!match) {
+      return res.status(401).json({ error: "Invalid password" });
+    }
+
+    res.json({
+      success: true,
+      token: "joytech-auth-token",
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email
+      }
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: "Login failed" });
+  }
+});
+
+/* ================= START SERVER ================= */
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});

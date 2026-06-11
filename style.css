@@ -86,7 +86,7 @@ nav {
   width: 280px;                       /* Custom narrow width bounds so homepage stays visible */
   height: 100vh;                      /* Full screen viewport container height */
   background: rgba(17, 24, 39, 0.96); /* Dark base with fine opacity to peek at homepage */
-  backdrop-filter: blur(8px);         /* Softly blurs your project cards underneath the panel */
+  backdrop-filter: blur(8px);        /* Softly blurs your project cards underneath the panel */
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
@@ -475,59 +475,27 @@ footer .footer-contacts a:hover {
    9. MEDIA QUERIES (RESPONSIVE ALIGNMENTS FOR MOBILE & TABLETS)
    ========================================================================== */
 @media(max-width: 900px) {
-  body {
-    padding-top: 65px; /* Tighter spacing for smaller viewport titles */
-  }
-
   header {
-    padding: 15px 5%;
-  }
-
-  section {
-    padding: 60px 5%; /* Brings layout padding in so text expands nicely on phone screens */
+    padding: 20px 5%;
   }
 
   .hero {
     flex-direction: column;
     text-align: center;
-    padding-top: 30px;
+    padding-top: 40px;
     justify-content: center;
-    gap: 30px;
   }
 
   .hero-text h1 {
-    font-size: 42px;
+    font-size: 45px;
   }
 
   .hero-text h2 {
-    font-size: 24px;
-  }
-
-  .hero-text p {
-    font-size: 15px;
-    margin: 15px auto;
-  }
-
-  .buttons .btn, .buttons .btn-outline {
-    padding: 12px 24px;
-    font-size: 15px;
+    font-size: 25px;
   }
 
   .hero-image img {
-    width: 260px;
-  }
-
-  .section-title {
-    margin-bottom: 35px;
-  }
-
-  .section-title h2 {
-    font-size: 32px;
-  }
-
-  .about p {
-    font-size: 16px;
-    line-height: 1.8;
+    width: 280px;
   }
 
   .contact-wrapper {

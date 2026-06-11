@@ -2,59 +2,29 @@ const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const app = express();
-const JWT_SECRET = process.env.JWT_SECRET || 'joytech_secret_key_2026';
 
-// ==========================================
-// 1. CORE MIDDLEWARE RULES
-// ==========================================
+// Middleware
 app.use(cors());
 app.use(express.json());
-// Serves static assets (CSS, JS, Images) directly from the root directory
-app.use(express.static(path.resolve(__dirname)));
 
-// ==========================================
-// 2. NEON POSTGRESQL CONNECTION POOL
-// ==========================================
+// Serve Frontend static assets
+app.use(express.static(__dirname));
+
+// Database Connection Configuration (Neon Console DB)
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 5000 // Prevents the application from stalling indefinitely
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
-// ==========================================
-// 3. SECURE ROUTING GATEWAYS (ABSOLUTE PATHS)
-// ==========================================
-// Served by default when visiting the root domain URL
-app.get('/', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'auth.html'));
-});
-
-// Protected portfolio application dashboard address
-app.get('/dashboard', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'index.html'));
-});
-
-// ==========================================
-// 4. ASYNCHRONOUS DATABASE SETUP
-// ==========================================
-// Runs concurrently in the background so it never blocks Render's internal port check
+// Automatically initialize tables on system startup
 const initDB = async () => {
     try {
-        console.log("Connecting to Neon PostgreSQL database...");
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                username VARCHAR(100) UNIQUE NOT NULL,
-                email VARCHAR(100) UNIQUE NOT NULL,
-                password VARCHAR(255) NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
+        // Core Form Leads Table
         await pool.query(`
             CREATE TABLE IF NOT EXISTS messages (
                 id SERIAL PRIMARY KEY,
@@ -64,82 +34,139 @@ const initDB = async () => {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
-        console.log("🚀 Database system architecture tables verified and active.");
+        // Authentication Account Matrix
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                username VARCHAR(50) UNIQUE NOT NULL,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+        console.log("Neon PostgreSQL infrastructure synchronized successfully.");
     } catch (err) {
-        console.error("⚠️ Database connection delayed or failed:", err.message);
+        console.error("Database initialization fault:", err);
     }
 };
 initDB();
 
-// ==========================================
-// 5. SECURE AUTHENTICATION ENDPOINTS
-// ==========================================
+// SERVE ROOT PORTFOLIO INDEX ARCHITECTURE
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-// USER REGISTER PORTAL
+// SERVE AUTHENTICATION PAGE ROUTE
+app.get('/auth', (req, res) => {
+    res.sendFile(path.join(__dirname, 'auth.html'));
+});
+
+/* ==========================================================================
+   AUTHENTICATION API SERVICE PIPELINES
+   ========================================================================== */
+
+// 1. REGISTRATION ENDPOINT (SIGN UP)
 app.post('/api/auth/signup', async (req, res) => {
     const { username, email, password } = req.body;
+    if (!username || !email || !password) {
+        return res.status(400).json({ error: "All account fields are mandatory fields." });
+    }
+
     try {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        await pool.query(
-            'INSERT INTO users(username, email, password) VALUES($1, $2, $3)',
-            [username, email, hashedPassword]
-        );
-
-        const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '24h' });
-        res.status(201).json({ success: true, token });
+        const queryText = 'INSERT INTO users(username, email, password) VALUES($1, $2, $3) RETURNING id, username, email';
+        const result = await pool.query(queryText, [username.trim().toLowerCase(), email.trim().toLowerCase(), password]);
+        res.status(201).json({ success: true, user: result.rows[0] });
     } catch (err) {
-        console.error("Signup exception caught:", err);
-        if (err.code === '23505') {
-            return res.status(400).json({ error: "Username or Email already registered." });
+        if(err.code === '23505') { // Code for duplicate item violations
+            return res.status(400).json({ error: "Username or email string already exists in records." });
         }
-        res.status(500).json({ error: "Server registration error." });
+        res.status(500).json({ error: "Database transaction error processing sign-up." });
     }
 });
 
-// USER LOGIN PORTAL
+// 2. VALIDATION ENDPOINT (SIGN IN)
 app.post('/api/auth/signin', async (req, res) => {
     const { userKey, password } = req.body;
-    try {
-        const result = await pool.query(
-            'SELECT * FROM users WHERE username = $1 OR email = $1',
-            [userKey]
-        );
+    if (!userKey || !password) {
+        return res.status(400).json({ error: "Credentials must contain user tags and credentials." });
+    }
 
-        if (result.rows.length > 0) {
-            const user = result.rows[0];
-            const isMatch = await bcrypt.compare(password, user.password);
-            
-            if (isMatch) {
-                const token = jwt.sign({ username: user.username }, JWT_SECRET, { expiresIn: '24h' });
-                return res.json({ success: true, token });
-            }
+    try {
+        // Query allows looking up account records via user parameters or email parameters
+        const queryText = 'SELECT * FROM users WHERE username = $1 OR email = $1';
+        const result = await pool.query(queryText, [userKey.trim().toLowerCase()]);
+
+        if (result.rows.length === 0 || result.rows[0].password !== password) {
+            return res.status(401).json({ error: "Invalid user identifiers or password credentials matches." });
         }
-        res.status(401).json({ error: "Invalid username, email, or password." });
+
+        const user = result.rows[0];
+        res.status(200).json({
+            success: true,
+            user: { id: user.id, username: user.username, email: user.email }
+        });
     } catch (err) {
-        console.error("Login exception caught:", err);
-        res.status(500).json({ error: "Server verification error." });
+        res.status(500).json({ error: "Server process fault parsing signature authentication requests." });
     }
 });
 
-// ==========================================
-// 6. BACKUP CONTACT FORM PROCESSING
-// ==========================================
+// 3. OVERWRITE PIPELINE ENGINE (FORGOT PASSWORD ALTERATIONS)
+app.post('/api/auth/forgot', async (req, res) => {
+    const { email, newPassword } = req.body;
+    if (!email || !newPassword) {
+        return res.status(400).json({ error: "Target email mapping and key replacements are mandatory parameters." });
+    }
+
+    try {
+        const checkQuery = 'SELECT id FROM users WHERE email = $1';
+        const checkRes = await pool.query(checkQuery, [email.trim().toLowerCase()]);
+
+        if (checkRes.rows.length === 0) {
+            return res.status(444).json({ error: "No account profile identified with matching email." });
+        }
+
+        const updateQuery = 'UPDATE users SET password = $1 WHERE email = $2';
+        await pool.query(updateQuery, [newPassword, email.trim().toLowerCase()]);
+        res.status(200).json({ success: true, message: "Target password block rewritten safely." });
+    } catch (err) {
+        res.status(500).json({ error: "Server structural database record writing failure." });
+    }
+});
+
+/* ==========================================================================
+   FORM INCOMING SUBMISSION HANDLERS
+   ========================================================================== */
 app.post('/api/contact', async (req, res) => {
     const { name, email, message } = req.body;
     try {
-        await pool.query('INSERT INTO messages(name, email, message) VALUES($1, $2, $3)', [name, email, message]);
-        res.status(201).json({ success: true });
+        const queryText = 'INSERT INTO messages(name, email, message) VALUES($1, $2, $3) RETURNING *';
+        const result = await pool.query(queryText, [name, email, message]);
+        
+        // Background Formspree API Relay Loop
+        try {
+            await fetch('https://formspree.io/f/xjgledbb', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ name, email, message })
+            });
+        } catch (e) { console.error("Formspree bridge pipeline idle.", e); }
+
+        res.status(201).json({ success: true, data: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Lead processing failure sequence tripped." });
     }
 });
 
-// ==========================================
-// 7. IMMEDIATE INSTANCE PORT BINDING
-// ==========================================
-const PORT = process.env.PORT || 10000;
+app.get('/api/messages', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM messages ORDER BY created_at DESC');
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: "Database reading trace processing fault." });
+    }
+});
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Port binding confirmed! JoyTech Engine listening directly on Port ${PORT}`);
+    console.log(`Server running successfully on port ${PORT}`);
 });

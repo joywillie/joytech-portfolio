@@ -1,210 +1,200 @@
-const express = require('express');
-const cors = require('cors');
-const { Pool } = require('pg');
-const path = require('path');
-const bcrypt = require('bcryptjs');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+const { Pool } = require("pg");
+const path = require("path");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-/* =========================
-   MIDDLEWARE
-========================= */
+const JWT_SECRET = process.env.JWT_SECRET || "joytech_secret_key_change_this";
+
+// =========================
+// MIDDLEWARE
+// =========================
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-/* =========================
-   DATABASE CONNECTION (NEON SAFE)
-========================= */
+// =========================
+// NEON DB CONNECTION (SAFE)
+// =========================
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false
-    }
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
-console.log("DATABASE_URL LOADED:", !!process.env.DATABASE_URL);
-
-/* =========================
-   DATABASE INIT (NON-BLOCKING)
-========================= */
+// =========================
+// DATABASE INIT (SAFE)
+// =========================
 const initDB = async () => {
-    try {
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS messages (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(100),
-                email VARCHAR(100),
-                service VARCHAR(100),
-                message TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
 
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                username VARCHAR(50) UNIQUE,
-                email VARCHAR(100) UNIQUE,
-                password VARCHAR(255),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100),
+        email VARCHAR(100),
+        service VARCHAR(100),
+        message TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
 
-        console.log("DB CONNECTED SUCCESSFULLY");
-    } catch (err) {
-        console.log("DB INIT ERROR (non-fatal):", err.message);
-    }
+    console.log("DB READY ✅");
+  } catch (err) {
+    console.error("DB INIT ERROR (non-fatal):", err.message);
+  }
 };
 
 initDB();
 
-/* =========================
-   ROUTES - PAGES
-========================= */
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+// =========================
+// ROUTES - FRONTEND
+// =========================
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
-app.get('/auth', (req, res) => {
-    res.sendFile(path.join(__dirname, 'auth.html'));
+app.get("/auth", (req, res) => {
+  res.sendFile(path.join(__dirname, "auth.html"));
 });
 
-/* =========================
-   AUTH - SIGNUP
-========================= */
-app.post('/api/auth/signup', async (req, res) => {
-    const { username, email, password } = req.body;
+// =========================
+// SIGNUP (SECURE)
+// =========================
+app.post("/api/auth/signup", async (req, res) => {
+  const { username, email, password } = req.body;
 
-    if (!username || !email || !password) {
-        return res.status(400).json({ error: "All fields are required" });
+  if (!username || !email || !password) {
+    return res.status(400).json({ error: "All fields required" });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await pool.query(
+      `INSERT INTO users (username, email, password)
+       VALUES ($1, $2, $3)
+       RETURNING id, username, email`,
+      [username.toLowerCase(), email.toLowerCase(), hashedPassword]
+    );
+
+    return res.status(201).json({
+      success: true,
+      user: result.rows[0],
+    });
+  } catch (err) {
+    if (err.code === "23505") {
+      return res.status(400).json({ error: "User already exists" });
     }
 
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const result = await pool.query(
-            `INSERT INTO users(username, email, password)
-             VALUES($1, $2, $3)
-             RETURNING id, username, email`,
-            [
-                username.trim().toLowerCase(),
-                email.trim().toLowerCase(),
-                hashedPassword
-            ]
-        );
-
-        res.status(201).json({
-            success: true,
-            user: result.rows[0]
-        });
-
-    } catch (err) {
-        console.log(err);
-
-        if (err.code === "23505") {
-            return res.status(400).json({
-                error: "Username or email already exists"
-            });
-        }
-
-        res.status(500).json({ error: "Signup failed" });
-    }
+    return res.status(500).json({ error: "Signup failed" });
+  }
 });
 
-/* =========================
-   AUTH - SIGNIN
-========================= */
-app.post('/api/auth/signin', async (req, res) => {
-    const { userKey, password } = req.body;
+// =========================
+// LOGIN (JWT TOKEN)
+// =========================
+app.post("/api/auth/signin", async (req, res) => {
+  const { userKey, password } = req.body;
 
-    if (!userKey || !password) {
-        return res.status(400).json({ error: "Missing credentials" });
+  if (!userKey || !password) {
+    return res.status(400).json({ error: "Missing credentials" });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT * FROM users WHERE username=$1 OR email=$1`,
+      [userKey.toLowerCase()]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: "Invalid login" });
     }
 
-    try {
-        const result = await pool.query(
-            `SELECT * FROM users WHERE username=$1 OR email=$1`,
-            [userKey.trim().toLowerCase()]
-        );
+    const user = result.rows[0];
 
-        if (result.rows.length === 0) {
-            return res.status(401).json({ error: "User not found" });
-        }
+    const validPassword = await bcrypt.compare(password, user.password);
 
-        const user = result.rows[0];
-
-        const isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) {
-            return res.status(401).json({ error: "Incorrect password" });
-        }
-
-        res.json({
-            success: true,
-            user: {
-                id: user.id,
-                username: user.username,
-                email: user.email
-            }
-        });
-
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: "Login failed" });
+    if (!validPassword) {
+      return res.status(401).json({ error: "Invalid login" });
     }
+
+    const token = jwt.sign(
+      { id: user.id, username: user.username },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    return res.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({ error: "Login failed" });
+  }
 });
 
-/* =========================
-   CONTACT FORM
-========================= */
-app.post('/api/contact', async (req, res) => {
-    const { name, email, service, message } = req.body;
+// =========================
+// CONTACT FORM
+// =========================
+app.post("/api/contact", async (req, res) => {
+  const { name, email, service, message } = req.body;
 
-    if (!name || !email || !message) {
-        return res.status(400).json({ error: "Missing required fields" });
-    }
+  try {
+    const result = await pool.query(
+      `INSERT INTO messages (name, email, service, message)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      [name, email, service, message]
+    );
 
-    try {
-        const result = await pool.query(
-            `INSERT INTO messages(name, email, service, message)
-             VALUES($1, $2, $3, $4)
-             RETURNING *`,
-            [name, email, service, message]
-        );
-
-        res.status(201).json({
-            success: true,
-            data: result.rows[0]
-        });
-
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: "Message not sent" });
-    }
+    return res.status(201).json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (err) {
+    return res.status(500).json({ error: "Message not saved" });
+  }
 });
 
-/* =========================
-   GET MESSAGES (ADMIN)
-========================= */
-app.get('/api/messages', async (req, res) => {
-    try {
-        const result = await pool.query(
-            `SELECT * FROM messages ORDER BY created_at DESC`
-        );
+// =========================
+// GET MESSAGES (ADMIN)
+// =========================
+app.get("/api/messages", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM messages ORDER BY created_at DESC"
+    );
 
-        res.json(result.rows);
-    } catch (err) {
-        res.status(500).json({ error: "Failed to load messages" });
-    }
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch messages" });
+  }
 });
 
-/* =========================
-   START SERVER
-========================= */
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// =========================
+// START SERVER
+// =========================
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
 });

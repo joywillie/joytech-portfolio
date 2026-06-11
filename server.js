@@ -7,12 +7,16 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware
+/* =========================
+   MIDDLEWARE
+========================= */
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Database connection
+/* =========================
+   DATABASE CONNECTION (NEON SAFE)
+========================= */
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -20,18 +24,20 @@ const pool = new Pool({
     }
 });
 
-// =======================
-// INIT DATABASE
-// =======================
+console.log("DATABASE_URL LOADED:", !!process.env.DATABASE_URL);
+
+/* =========================
+   DATABASE INIT (NON-BLOCKING)
+========================= */
 const initDB = async () => {
     try {
         await pool.query(`
             CREATE TABLE IF NOT EXISTS messages (
                 id SERIAL PRIMARY KEY,
-                name VARCHAR(100) NOT NULL,
-                email VARCHAR(100) NOT NULL,
+                name VARCHAR(100),
+                email VARCHAR(100),
                 service VARCHAR(100),
-                message TEXT NOT NULL,
+                message TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
@@ -39,24 +45,24 @@ const initDB = async () => {
         await pool.query(`
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
-                username VARCHAR(50) UNIQUE NOT NULL,
-                email VARCHAR(100) UNIQUE NOT NULL,
-                password VARCHAR(255) NOT NULL,
+                username VARCHAR(50) UNIQUE,
+                email VARCHAR(100) UNIQUE,
+                password VARCHAR(255),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
 
-        console.log("Database ready.");
+        console.log("DB CONNECTED SUCCESSFULLY");
     } catch (err) {
-        console.error("DB init error:", err);
+        console.log("DB INIT ERROR (non-fatal):", err.message);
     }
 };
 
 initDB();
 
-// =======================
-// PAGES
-// =======================
+/* =========================
+   ROUTES - PAGES
+========================= */
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -65,9 +71,9 @@ app.get('/auth', (req, res) => {
     res.sendFile(path.join(__dirname, 'auth.html'));
 });
 
-// =======================
-// AUTH: SIGNUP
-// =======================
+/* =========================
+   AUTH - SIGNUP
+========================= */
 app.post('/api/auth/signup', async (req, res) => {
     const { username, email, password } = req.body;
 
@@ -95,9 +101,9 @@ app.post('/api/auth/signup', async (req, res) => {
         });
 
     } catch (err) {
-        console.error(err);
+        console.log(err);
 
-        if (err.code === '23505') {
+        if (err.code === "23505") {
             return res.status(400).json({
                 error: "Username or email already exists"
             });
@@ -107,9 +113,9 @@ app.post('/api/auth/signup', async (req, res) => {
     }
 });
 
-// =======================
-// AUTH: SIGNIN
-// =======================
+/* =========================
+   AUTH - SIGNIN
+========================= */
 app.post('/api/auth/signin', async (req, res) => {
     const { userKey, password } = req.body;
 
@@ -129,9 +135,9 @@ app.post('/api/auth/signin', async (req, res) => {
 
         const user = result.rows[0];
 
-        const passwordMatch = await bcrypt.compare(password, user.password);
+        const isMatch = await bcrypt.compare(password, user.password);
 
-        if (!passwordMatch) {
+        if (!isMatch) {
             return res.status(401).json({ error: "Incorrect password" });
         }
 
@@ -145,19 +151,19 @@ app.post('/api/auth/signin', async (req, res) => {
         });
 
     } catch (err) {
-        console.error(err);
+        console.log(err);
         res.status(500).json({ error: "Login failed" });
     }
 });
 
-// =======================
-// CONTACT FORM
-// =======================
+/* =========================
+   CONTACT FORM
+========================= */
 app.post('/api/contact', async (req, res) => {
     const { name, email, service, message } = req.body;
 
     if (!name || !email || !message) {
-        return res.status(400).json({ error: "Missing fields" });
+        return res.status(400).json({ error: "Missing required fields" });
     }
 
     try {
@@ -174,29 +180,29 @@ app.post('/api/contact', async (req, res) => {
         });
 
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Message failed to send" });
+        console.log(err);
+        res.status(500).json({ error: "Message not sent" });
     }
 });
 
-// =======================
-// GET MESSAGES (ADMIN)
-// =======================
+/* =========================
+   GET MESSAGES (ADMIN)
+========================= */
 app.get('/api/messages', async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT * FROM messages ORDER BY created_at DESC'
+            `SELECT * FROM messages ORDER BY created_at DESC`
         );
 
         res.json(result.rows);
     } catch (err) {
-        res.status(500).json({ error: "Failed to fetch messages" });
+        res.status(500).json({ error: "Failed to load messages" });
     }
 });
 
-// =======================
-// START SERVER
-// =======================
+/* =========================
+   START SERVER
+========================= */
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

@@ -1,80 +1,94 @@
-// --- 1. RESPONSIVE MOBILE MENU SELECTION CONTROLLER ---
+// ======================================================
+// 1. MOBILE MENU CONTROLLER (SAFE + RESPONSIVE)
+// ======================================================
 const menuToggle = document.querySelector('.menu-toggle');
 const navMenu = document.querySelector('nav');
 const navLinks = document.querySelectorAll('nav a');
 
-menuToggle.addEventListener('click', () => {
-  menuToggle.classList.toggle('active');
-  navMenu.classList.toggle('active');
-});
-
-navLinks.forEach(link => {
-  link.addEventListener('click', () => {
-    menuToggle.classList.remove('active');
-    navMenu.classList.remove('active');
-  });
-});
-
-// --- 2. SYSTEM SECURE LOGOUT ---
-const logoutBtn = document.getElementById('logoutBtn');
-if (logoutBtn) {
-  logoutBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    localStorage.removeItem('joytech_token'); // Clear the session token
-    window.location.replace('/'); // Send back to login gateway
+if (menuToggle && navMenu) {
+  menuToggle.addEventListener('click', () => {
+    menuToggle.classList.toggle('active');
+    navMenu.classList.toggle('active');
   });
 }
 
-// --- 3. SECURE FORMSPREE ASYNCHRONOUS SUBMISSION PIPELINE ---
-const contactForm = document.getElementById('contact-form');
-if (contactForm) {
-  contactForm.addEventListener('submit', async function(e) {
+navLinks.forEach(link => {
+  link.addEventListener('click', () => {
+    menuToggle?.classList.remove('active');
+    navMenu?.classList.remove('active');
+  });
+});
+
+
+// ======================================================
+// 2. LOGOUT SYSTEM (SECURE SESSION CLEAR)
+// ======================================================
+const logoutBtn = document.getElementById('logoutBtn');
+
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    
-    const form = e.target;
-    const submitBtn = form.querySelector('[data-fs-submit-btn]');
+
+    localStorage.removeItem('joytech_token');
+    window.location.replace('/auth');
+  });
+}
+
+
+// ======================================================
+// 3. CONTACT FORM (FORMSPREE + BACKEND SAFE PIPELINE)
+// ======================================================
+const contactForm = document.getElementById('contact-form');
+
+if (contactForm) {
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const submitBtn = contactForm.querySelector('[data-fs-submit-btn]');
     const successAlert = document.querySelector('[data-fs-success]');
     const errorAlert = document.querySelector('[data-fs-error]');
-    
-    successAlert.style.display = 'none';
-    errorAlert.style.display = 'none';
-    form.querySelectorAll('[data-fs-field]').forEach(field => field.removeAttribute('aria-invalid'));
-    form.querySelectorAll('.field-error').forEach(err => err.textContent = '');
 
-    submitBtn.disabled = true;
-    const originalBtnText = submitBtn.textContent;
-    submitBtn.textContent = 'Sending...';
+    if (successAlert) successAlert.style.display = 'none';
+    if (errorAlert) errorAlert.style.display = 'none';
 
-    const formData = new FormData(form);
+    contactForm.querySelectorAll('[data-fs-field]')
+      .forEach(f => f.removeAttribute('aria-invalid'));
+
+    contactForm.querySelectorAll('.field-error')
+      .forEach(el => el.textContent = '');
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+    }
+
+    const formData = new FormData(contactForm);
 
     try {
-      const response = await fetch('https://formspree.io/f/xjgledbb', {
+      const response = await fetch('/api/contact', {
         method: 'POST',
         body: formData,
         headers: { 'Accept': 'application/json' }
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        successAlert.style.display = 'block';
-        form.reset();
+        if (successAlert) successAlert.style.display = 'block';
+        contactForm.reset();
       } else {
-        const data = await response.json();
-        if (data.errors) {
-          data.errors.forEach(err => {
-            const fieldInput = form.querySelector(`[name="${err.field}"]`);
-            const fieldErrorSpan = form.querySelector(`[data-fs-error="${err.field}"]`);
-            
-            if (fieldInput) fieldInput.setAttribute('aria-invalid', 'true');
-            if (fieldErrorSpan) fieldErrorSpan.textContent = err.message;
-          });
-        }
+        throw new Error(data.error || 'Submission failed');
+      }
+
+    } catch (error) {
+      if (errorAlert) {
         errorAlert.style.display = 'block';
       }
-    } catch (error) {
-      errorAlert.style.display = 'block';
     } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalBtnText;
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Message';
+      }
     }
   });
 }

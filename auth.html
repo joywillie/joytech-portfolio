@@ -249,9 +249,9 @@ async function login() {
 
       showMessage("Login successful. Redirecting...", "success");
 
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 1200);
+     setTimeout(() => {
+  window.location.replace("/index.html");
+}, 1200);
 
     } else {
       throw new Error(result.error);

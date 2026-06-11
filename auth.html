@@ -1,327 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JoyTech | Secure Gateway</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    /* Global Reset & Theme Variables */
-    :root {
-      --bg-deep: #0b1329;
-      --panel-bg: rgba(17, 28, 58, 0.75);
-      --accent-blue: #1d4ed8;
-      --accent-glow: #3b82f6;
-      --text-gold: #fbbf24;
-      --text-muted: #94a3b8;
-    }
+if(response.ok){
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
 
-    body {
-      background: radial-gradient(circle at center, #1e293b 0%, var(--bg-deep) 100%);
-      color: #f1f5f9;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      overflow-x: hidden;
-    }
+localStorage.setItem(
+"joytech_token",
+result.token
+);
 
-    /* Glassmorphism Portal Card */
-    .portal-card {
-      width: 100%;
-      max-width: 440px;
-      background: var(--panel-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(29, 78, 216, 0.25);
-      border-radius: 20px;
-      padding: 45px 35px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-      transform: translateY(0);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
 
-    .portal-card:hover {
-      border-color: rgba(59, 130, 246, 0.5);
-      box-shadow: 0 30px 60px -10px rgba(29, 78, 216, 0.25);
-    }
+notifier.textContent=
+"✓ Login successful";
 
-    /* Header Styling */
-    .portal-header {
-      text-align: center;
-      margin-bottom: 35px;
-    }
 
-    .portal-header .logo {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--text-gold);
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-      text-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
-    }
+notifier.className=
+"status-banner success";
 
-    .portal-header p {
-      color: var(--text-muted);
-      font-size: 14px;
-      font-weight: 300;
-    }
 
-    /* Form Fields Styling */
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 24px;
-      position: relative;
-    }
+notifier.style.display="block";
 
-    .form-group label {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
 
-    .form-group input {
-      background: rgba(11, 19, 41, 0.6);
-      border: 1.5px solid rgba(29, 78, 216, 0.4);
-      padding: 14px 16px;
-      border-radius: 10px;
-      color: #ffffff;
-      font-size: 15px;
-      outline: none;
-      transition: all 0.3s ease;
-    }
 
-    .form-group input:focus {
-      border-color: var(--accent-glow);
-      box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
-      background: rgba(11, 19, 41, 0.9);
-    }
+setTimeout(()=>{
 
-    /* Premium Button Style */
-    .btn-portal {
-      background: linear-gradient(135deg, var(--accent-blue) 0%, #1e40af 100%);
-      color: #ffffff;
-      border: none;
-      padding: 14px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 16px;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      width: 100%;
-      box-shadow: 0 4px 15px rgba(29, 78, 216, 0.4);
-      transition: all 0.3s ease;
-    }
+window.location.href="/dashboard";
 
-    .btn-portal:hover {
-      background: linear-gradient(135deg, #2563eb 0%, var(--accent-blue) 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-    }
+},1000);
 
-    .btn-portal:active {
-      transform: translateY(0);
-    }
 
-    /* Footer Navigation Option Toggle */
-    .portal-switch {
-      text-align: center;
-      margin-top: 25px;
-      font-size: 14px;
-      color: var(--text-muted);
-    }
 
-    .portal-switch span {
-      color: var(--text-gold);
-      font-weight: 500;
-      cursor: pointer;
-      margin-left: 5px;
-      transition: color 0.2s ease;
-    }
+}else{
 
-    .portal-switch span:hover {
-      color: #fcd34d;
-      text-decoration: underline;
-    }
+throw new Error(result.error);
 
-    /* Utilities & Visibility States */
-    .hidden-view {
-      display: none !important;
-    }
-
-    /* Clean Status Alert Banners */
-    .status-banner {
-      padding: 14px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 24px;
-      text-align: center;
-      animation: fadeIn 0.4s ease;
-    }
-
-    .success {
-      background: rgba(16, 185, 129, 0.12);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-
-    .error {
-      background: rgba(239, 68, 68, 0.12);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
-</head>
-<body>
-
-  <div class="portal-card">
-    <div class="portal-header">
-      <div class="logo">JoyTech</div>
-      <p id="portalDesc">Create your account to unlock access</p>
-    </div>
-
-    <div id="notifier" class="status-banner" style="display: none;"></div>
-
-    <div id="signupBox">
-      <form id="signupForm">
-        <div class="form-group">
-          <label for="regUser">Username</label>
-          <input type="text" id="regUser" placeholder="Choose username" autocomplete="username" required />
-        </div>
-        <div class="form-group">
-          <label for="regEmail">Email Address</label>
-          <input type="email" id="regEmail" placeholder="yourname@example.com" autocomplete="email" required />
-        </div>
-        <div class="form-group">
-          <label for="regPass">Password</label>
-          <input type="password" id="regPass" placeholder="••••••••" autocomplete="new-password" required />
-        </div>
-        <button type="submit" class="btn-portal">Register Account</button>
-      </form>
-      <div class="portal-switch">Already registered? <span onclick="switchToLogin()">Sign In</span></div>
-    </div>
-
-    <div id="loginBox" class="hidden-view">
-      <form id="loginForm">
-        <div class="form-group">
-          <label for="logUser">Username or Email</label>
-          <input type="text" id="logUser" placeholder="Enter username or email" autocomplete="username" required />
-        </div>
-        <div class="form-group">
-          <label for="logPass">Password</label>
-          <input type="password" id="logPass" placeholder="••••••••" autocomplete="current-password" required />
-        </div>
-        <button type="submit" class="btn-portal">Secure Unlock</button>
-      </form>
-      <div class="portal-switch">First time visiting? <span onclick="switchToSignup()">Create Account</span></div>
-    </div>
-  </div>
-
-  <script>
-    const notifier = document.getElementById('notifier');
-    const signupBox = document.getElementById('signupBox');
-    const loginBox = document.getElementById('loginBox');
-    const portalDesc = document.getElementById('portalDesc');
-
-    function switchToLogin() {
-      signupBox.classList.add('hidden-view');
-      loginBox.classList.remove('hidden-view');
-      portalDesc.textContent = "Sign in to authenticate identity";
-      notifier.style.display = 'none';
-    }
-
-    function switchToSignup() {
-      loginBox.classList.add('hidden-view');
-      signupBox.classList.remove('hidden-view');
-      portalDesc.textContent = "Create your account to unlock access";
-      notifier.style.display = 'none';
-    }
-
-    // Pipeline 1: Process Registration Form Data Input strings
-    document.getElementById('signupForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      notifier.style.display = 'none';
-
-      try {
-        const response = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: document.getElementById('regUser').value,
-            email: document.getElementById('regEmail').value,
-            password: document.getElementById('regPass').value
-          })
-        });
-        const result = await response.json();
-
-        if (response.ok) {
-          notifier.textContent = "✓ Account setup complete! Preparing lock screen...";
-          notifier.className = "status-banner success";
-          notifier.style.display = "block";
-          
-          // Smooth structural visual window transitions
-          setTimeout(() => { switchToLogin(); }, 1400);
-        } else {
-          throw new Error(result.error);
-        }
-      } catch (err) {
-        notifier.textContent = `✗ ${err.message}`;
-        notifier.className = "status-banner error";
-        notifier.style.display = "block";
-      }
-    });
-
-    // Pipeline 2: Process Credential Identity Verification matches
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      notifier.style.display = 'none';
-
-      try {
-        const response = await fetch('/api/auth/signin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userKey: document.getElementById('logUser').value,
-            password: document.getElementById('logPass').value
-          })
-        });
-        const result = await response.json();
-
-        if (response.ok) {
-          notifier.textContent = "✓ Authorization verification verified. Unlocking dashboard...";
-          notifier.className = "status-banner success";
-          notifier.style.display = "block";
-
-          // Route pipeline jump directly into main index website page
-          setTimeout(() => { window.location.href = '/dashboard'; }, 1200);
-        } else {
-          throw new Error(result.error);
-        }
-      } catch (err) {
-        notifier.textContent = `✗ ${err.message}`;
-        notifier.className = "status-banner error";
-        notifier.style.display = "block";
-      }
-    });
-  </script>
-</body>
-</html>
+}

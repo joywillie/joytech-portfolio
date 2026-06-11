@@ -7,8 +7,13 @@
 
   <!-- AUTH GUARD (must be first) -->
   <script>
-    if (!localStorage.getItem("joytech_token")) {
-      window.location.replace("/");
+    document.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("joytech_token");
+
+  if (!token) {
+    window.location.replace("/auth");
+  }
+});
     }
   </script>
 

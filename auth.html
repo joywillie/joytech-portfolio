@@ -3,203 +3,186 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JoyTech Portfolio</title>
-
-  <!-- AUTH GUARD (must be first) -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-  const token = localStorage.getItem("joytech_token");
-
-  if (!token) {
-    window.location.replace("/auth");
-  }
-});
-    }
-  </script>
+  <title>JoyTech | Secure Login</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .box {
+      width: 380px;
+      background: #111827;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #38bdf8;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 6px;
+      background: #1e293b;
+      color: white;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #38bdf8;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0ea5e9;
+    }
+
+    .toggle {
+      text-align: center;
+      margin-top: 10px;
+      cursor: pointer;
+      color: #94a3b8;
+    }
+
+    .toggle:hover {
+      color: #38bdf8;
+    }
+
+    .msg {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .error { color: #f87171; }
+    .success { color: #34d399; }
+  </style>
 </head>
 
 <body>
 
-  <!-- HEADER -->
-  <header>
-    <div class="logo">JoyTech</div>
+<div class="box">
 
-    <button class="menu-toggle" aria-label="Toggle navigation menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
+  <h2 id="title">Login</h2>
 
-    <nav id="main-navigation">
-      <a href="#home">Home</a>
-      <a href="#about">About</a>
-      <a href="#skills">Skills</a>
-      <a href="#projects">Projects</a>
-      <a href="#contact">Contact</a>
+  <div id="msg" class="msg"></div>
 
-      <!-- LOGOUT -->
-      <a href="#" id="logoutBtn"
-         style="color:#f87171;border:1px solid #f87171;padding:6px 12px;border-radius:6px;">
-         Logout
-      </a>
-    </nav>
-  </header>
+  <!-- SIGNUP -->
+  <div id="signupBox" style="display:none;">
+    <input id="su_username" placeholder="Username">
+    <input id="su_email" placeholder="Email">
+    <input id="su_password" type="password" placeholder="Password">
+    <button onclick="signup()">Create Account</button>
+    <div class="toggle" onclick="toggle()">Already have account? Login</div>
+  </div>
 
-  <!-- HERO -->
-  <section class="hero" id="home">
-    <div class="hero-text">
-      <h3>Hello, I'm</h3>
-      <h1>Joyce William</h1>
-      <h2>ICT Technician & Web Developer</h2>
-      <p>
-        Passionate about web development, UI/UX design, mobile apps,
-        and modern digital systems.
-      </p>
+  <!-- LOGIN -->
+  <div id="loginBox">
+    <input id="li_user" placeholder="Username or Email">
+    <input id="li_password" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <div class="toggle" onclick="toggle()">Create new account</div>
+  </div>
 
-      <div class="buttons">
-        <a href="#projects" class="btn">View Projects</a>
-        <a href="#contact" class="btn-outline">Contact Me</a>
-      </div>
-    </div>
+</div>
 
-    <div class="hero-image">
-      <img src="image1.jpg" alt="Profile">
-    </div>
-  </section>
+<script>
+let isLogin = true;
 
-  <!-- ABOUT -->
-  <section class="about" id="about">
-    <h2 class="section-title">About Me</h2>
-    <p>
-      I am an ICT Technician focused on software development,
-      UI/UX design, and system building.
-    </p>
-  </section>
+function toggle() {
+  isLogin = !isLogin;
 
-  <!-- SKILLS -->
-  <section class="skills" id="skills">
-    <h2 class="section-title">Skills</h2>
+  document.getElementById("signupBox").style.display = isLogin ? "none" : "block";
+  document.getElementById("loginBox").style.display = isLogin ? "block" : "none";
+  document.getElementById("title").innerText = isLogin ? "Login" : "Sign Up";
+  document.getElementById("msg").innerText = "";
+}
 
-    <div class="skills-container">
-      <div class="skill-card"><h3>HTML</h3></div>
-      <div class="skill-card"><h3>CSS</h3></div>
-      <div class="skill-card"><h3>JavaScript</h3></div>
-      <div class="skill-card"><h3>Flutter</h3></div>
-      <div class="skill-card"><h3>UI/UX</h3></div>
-      <div class="skill-card"><h3>Canva</h3></div>
-    </div>
-  </section>
+// =====================
+// SIGNUP
+// =====================
+async function signup() {
+  const username = document.getElementById("su_username").value;
+  const email = document.getElementById("su_email").value;
+  const password = document.getElementById("su_password").value;
 
-  <!-- PROJECTS -->
-  <section class="projects" id="projects">
-    <h2 class="section-title">Projects</h2>
+  try {
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email, password })
+    });
 
-    <div class="project-container">
-      <div class="project-card">
-        <img src="image.png" alt="Calculator">
-        <h3>Calculator App</h3>
-        <p>Flutter calculator with modern UI.</p>
-      </div>
+    const data = await res.json();
 
-      <div class="project-card">
-        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3" alt="Design">
-        <h3>Posters</h3>
-        <p>Creative Canva designs for events.</p>
-      </div>
+    if (!res.ok) throw new Error(data.error);
 
-      <div class="project-card">
-        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085" alt="Website">
-        <h3>Portfolio Website</h3>
-        <p>Responsive web portfolio using HTML/CSS/JS.</p>
-      </div>
-    </div>
-  </section>
+    document.getElementById("msg").innerHTML =
+      "<span class='success'>Account created successfully</span>";
 
-  <!-- CONTACT -->
-  <section class="contact" id="contact">
-    <h2 class="section-title">Contact</h2>
+    toggle();
 
-    <div class="contact-wrapper">
-      <div class="contact-info">
-        <div class="info-item">
-          <h4>Phone</h4>
-          <a href="tel:0745806435">0745806435</a>
-        </div>
+  } catch (err) {
+    document.getElementById("msg").innerHTML =
+      "<span class='error'>" + err.message + "</span>";
+  }
+}
 
-        <div class="info-item">
-          <h4>WhatsApp</h4>
-          <a href="https://wa.me/254745806435">Chat Now</a>
-        </div>
+// =====================
+// LOGIN
+// =====================
+async function login() {
+  const userKey = document.getElementById("li_user").value;
+  const password = document.getElementById("li_password").value;
 
-        <div class="info-item">
-          <h4>Email</h4>
-          <a href="mailto:jw42205769@gmail.com">Email Me</a>
-        </div>
-      </div>
+  try {
+    const res = await fetch("/api/auth/signin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userKey, password })
+    });
 
-      <div class="form-container">
-        <form id="contact-form" class="custom-form">
+    const data = await res.json();
 
-          <input type="text" name="name" placeholder="Your Name" required>
-          <input type="email" name="email" placeholder="Your Email" required>
+    if (!res.ok) throw new Error(data.error);
 
-          <select name="service" required>
-            <option value="">Select Service</option>
-            <option>Web Design</option>
-             <option>KRA Registration $ filing returns</option>
-             <option>KUCCPS Applications</option>
-             <option>Graphic Design</option>
-             <option>Helb Application</option>
-            <option>Mobile App</option>
-            <option>UI/UX</option>
-          </select>
+    // ✅ IMPORTANT FIX (TOKEN STORAGE)
+    localStorage.setItem("joytech_token", data.token);
 
-          <textarea name="message" placeholder="Message" required></textarea>
+    document.getElementById("msg").innerHTML =
+      "<span class='success'>Login successful! Redirecting...</span>";
 
-          <button type="submit" class="btn-submit">Send Message</button>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    <p>© 2026 JoyTech Portfolio | Joyce William</p>
-  </footer>
-
-  <!-- LOGOUT SCRIPT -->
-  <script>
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    logoutBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      localStorage.removeItem("joytech_token");
+    setTimeout(() => {
       window.location.href = "/";
-    });
-  </script>
+    }, 1000);
 
-  <!-- MENU SCRIPT -->
-  <script>
-    const menuToggle = document.querySelector(".menu-toggle");
-    const nav = document.querySelector("nav");
+  } catch (err) {
+    document.getElementById("msg").innerHTML =
+      "<span class='error'>" + err.message + "</span>";
+  }
+}
+</script>
 
-    menuToggle.addEventListener("click", () => {
-      nav.classList.toggle("active");
-      menuToggle.classList.toggle("active");
-    });
-
-    document.querySelectorAll("nav a").forEach(link => {
-      link.addEventListener("click", () => {
-        nav.classList.remove("active");
-        menuToggle.classList.remove("active");
-      });
-    });
-  </script>
-
-  <script src="script.js"></script>
 </body>
 </html>

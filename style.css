@@ -1,6 +1,6 @@
-/* ==========================================================================
-   1. GLOBAL RESETS & THEME DEFINITIONS
-   ========================================================================== */
+/* =========================
+   GLOBAL RESET
+========================= */
 * {
   margin: 0;
   padding: 0;
@@ -15,19 +15,18 @@ html {
 body {
   background: #0f172a;
   color: white;
-  padding-top: 73px; /* Prevents hero content from hiding behind fixed header */
-  overflow-x: hidden; /* Prevents horizontal scrollbars when menu is tucked away */
+  overflow-x: hidden;
 }
 
-/* ==========================================================================
-   2. NAVIGATION HEADER & GLOBAL HAMBURGER DRAWER
-   ========================================================================== */
+/* =========================
+   HEADER
+========================= */
 header {
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 8%;
+  padding: 18px 8%;
   background: #111827;
   position: fixed;
   top: 0;
@@ -36,12 +35,14 @@ header {
 }
 
 .logo {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
   color: #38bdf8;
 }
 
-/* Force the hamburger icon button to show on ALL screens */
+/* =========================
+   HAMBURGER MENU
+========================= */
 .menu-toggle {
   display: flex;
   flex-direction: column;
@@ -49,23 +50,20 @@ header {
   cursor: pointer;
   background: none;
   border: none;
-  padding: 5px;
-  z-index: 1100; /* Stays floating above the slide drawer */
+  z-index: 1100;
 }
 
 .menu-toggle span {
-  display: block;
-  width: 30px;
+  width: 28px;
   height: 3px;
-  background-color: white;
+  background: white;
   border-radius: 3px;
-  transition: 0.3s ease-in-out;
+  transition: 0.3s ease;
 }
 
-/* Animated Hamburger Morphing into an 'X' symbol when clicked */
 .menu-toggle.active span:nth-child(1) {
   transform: translateY(9px) rotate(45deg);
-  background-color: #38bdf8;
+  background: #38bdf8;
 }
 
 .menu-toggle.active span:nth-child(2) {
@@ -74,30 +72,30 @@ header {
 
 .menu-toggle.active span:nth-child(3) {
   transform: translateY(-9px) rotate(-45deg);
-  background-color: #38bdf8;
+  background: #38bdf8;
 }
 
-/* Navigation Overlay Menu Panel (Styled as a clean right-side drawer panel) */
+/* =========================
+   NAVIGATION (MOBILE DRAWER)
+========================= */
 nav {
   position: fixed;
-  top: 0;                             /* Spans from the very top of the screen */
-  right: -100%;                       /* Hidden safely off-screen to the right side */
-  left: auto;                         /* Overrides original left alignment properties */
-  width: 280px;                       /* Custom narrow width bounds so homepage stays visible */
-  height: 100vh;                      /* Full screen viewport container height */
-  background: rgba(17, 24, 39, 0.96); /* Dark base with fine opacity to peek at homepage */
-  backdrop-filter: blur(8px);        /* Softly blurs your project cards underneath the panel */
+  top: 0;
+  right: -100%;
+  width: 280px;
+  height: 100vh;
+  background: rgba(17, 24, 39, 0.98);
+  backdrop-filter: blur(10px);
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 100px;                 /* Extra space so links clear the absolute header items */
-  gap: 30px;
-  transition: right 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); /* Premium fluid transition curve */
-  border-left: 1px solid #1e293b;     /* Structural panel divider line */
-  display: flex;
+  padding-top: 100px;
+  gap: 25px;
+  transition: 0.35s ease-in-out;
+  border-left: 1px solid #1e293b;
 }
 
-/* Slides the drawer menu out when the active class token is attached by JS */
 nav.active {
   right: 0;
 }
@@ -105,11 +103,8 @@ nav.active {
 nav a {
   color: white;
   text-decoration: none;
+  font-size: 20px;
   font-weight: 500;
-  font-size: 22px;
-  width: 100%;
-  text-align: center;
-  padding: 10px 0;
   transition: 0.3s;
 }
 
@@ -117,60 +112,56 @@ nav a:hover {
   color: #38bdf8;
 }
 
-/* ==========================================================================
-   3. HERO SECTION
-   ========================================================================== */
+/* =========================
+   HERO SECTION
+========================= */
 .hero {
-  min-height: calc(100vh - 73px);
+  min-height: 100vh;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 60px 8%;
+  padding: 80px 8%;
   gap: 40px;
 }
 
-.hero-text {
-  flex: 1;
-}
-
 .hero-text h3 {
-  font-size: 25px;
-  margin-bottom: 10px;
+  font-size: 22px;
 }
 
 .hero-text h1 {
-  font-size: 65px;
+  font-size: 60px;
   color: #38bdf8;
-  line-height: 1.1;
 }
 
 .hero-text h2 {
-  font-size: 32px;
-  margin: 15px 0;
-  color: #e2e8f0;
+  font-size: 28px;
+  margin: 10px 0;
 }
 
 .hero-text p {
-  margin: 20px 0;
-  line-height: 1.8;
   max-width: 600px;
+  line-height: 1.7;
   color: #cbd5e1;
 }
 
-.buttons {
-  margin-top: 30px;
+.hero-image img {
+  width: 320px;
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
 }
 
+/* =========================
+   BUTTONS
+========================= */
 .btn {
+  display: inline-block;
   background: #38bdf8;
   color: black;
-  padding: 14px 28px;
-  text-decoration: none;
+  padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
-  margin-right: 15px;
-  transition: 0.3s;
-  display: inline-block;
+  margin-right: 10px;
+  text-decoration: none;
 }
 
 .btn:hover {
@@ -178,13 +169,12 @@ nav a:hover {
 }
 
 .btn-outline {
+  display: inline-block;
   border: 2px solid #38bdf8;
   color: #38bdf8;
-  padding: 12px 28px;
-  text-decoration: none;
+  padding: 10px 24px;
   border-radius: 8px;
-  transition: 0.3s;
-  display: inline-block;
+  text-decoration: none;
 }
 
 .btn-outline:hover {
@@ -192,319 +182,170 @@ nav a:hover {
   color: black;
 }
 
-.hero-image img {
-  width: 350px;
-  border-radius: 20px;
-  box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
-}
-
-/* ==========================================================================
-   4. SECTIONS COMMON LAYOUT
-   ========================================================================== */
+/* =========================
+   SECTIONS
+========================= */
 section {
-  padding: 100px 8%;
+  padding: 80px 8%;
 }
 
 .section-title {
-  margin-bottom: 50px;
   text-align: center;
-}
-
-.section-title h2 {
-  font-size: 42px;
+  font-size: 38px;
   color: #38bdf8;
+  margin-bottom: 40px;
 }
 
-/* ABOUT SECTION */
+/* =========================
+   ABOUT
+========================= */
 .about p {
-  max-width: 900px;
-  margin: auto;
   text-align: center;
-  line-height: 2;
+  max-width: 850px;
+  margin: auto;
+  line-height: 1.8;
   color: #cbd5e1;
-  font-size: 18px;
 }
 
-/* ==========================================================================
-   5. SKILLS GRID
-   ========================================================================== */
+/* =========================
+   SKILLS
+========================= */
 .skills-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
 }
 
 .skill-card {
   background: #1e293b;
-  padding: 35px;
-  border-radius: 15px;
+  padding: 30px;
   text-align: center;
+  border-radius: 12px;
   transition: 0.3s;
-  border: 1px solid transparent;
 }
 
 .skill-card:hover {
-  transform: translateY(-10px);
-  border-color: #38bdf8;
+  transform: translateY(-8px);
+  border: 1px solid #38bdf8;
 }
 
-.skill-card h3 {
-  font-size: 22px;
-}
-
-/* ==========================================================================
-   6. PROJECTS GRID
-   ========================================================================== */
+/* =========================
+   PROJECTS
+========================= */
 .project-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
 }
 
 .project-card {
   background: #1e293b;
-  border-radius: 15px;
+  border-radius: 12px;
   overflow: hidden;
   transition: 0.3s;
 }
 
 .project-card:hover {
-  transform: translateY(-10px);
+  transform: translateY(-8px);
 }
 
 .project-card img {
   width: 100%;
-  height: 220px;
+  height: 200px;
   object-fit: cover;
 }
 
 .project-card h3 {
-  padding: 20px 20px 10px;
   color: #38bdf8;
+  padding: 15px;
 }
 
 .project-card p {
-  padding: 0 20px 25px;
+  padding: 0 15px 20px;
   color: #cbd5e1;
 }
 
-/* ==========================================================================
-   7. CONTACT WRAPPER & RESPONSIVE FORM
-   ========================================================================== */
+/* =========================
+   CONTACT
+========================= */
 .contact-wrapper {
-  max-width: 950px;
-  margin: auto;
   display: grid;
   grid-template-columns: 1fr 1.5fr;
-  gap: 40px;
-}
-
-.contact-info {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  gap: 30px;
 }
 
 .info-item {
   background: #1e293b;
-  padding: 20px;
-  border-radius: 12px;
+  padding: 18px;
+  border-radius: 10px;
   border-left: 4px solid #38bdf8;
 }
 
 .info-item h4 {
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
   color: #38bdf8;
-  margin-bottom: 5px;
+  font-size: 14px;
 }
 
 .info-item a {
   color: white;
   text-decoration: none;
-  font-size: 16px;
-  font-weight: 500;
-  transition: 0.3s;
 }
 
-.info-item a:hover {
-  color: #38bdf8;
-}
-
-.form-container {
+.custom-form input,
+.custom-form select,
+.custom-form textarea {
   width: 100%;
-}
-
-.custom-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.form-row {
-  display: flex;
-  gap: 16px;
-}
-
-.form-row .form-group {
-  flex: 1;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.form-group label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #94a3b8;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 16px;
+  padding: 14px;
+  margin-bottom: 15px;
+  border-radius: 8px;
   border: none;
-  border-radius: 10px;
   background: #1e293b;
   color: white;
-  font-size: 16px;
-  transition: box-shadow 0.15s ease-in-out;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px #38bdf8;
-}
-
-.form-group select {
-  cursor: pointer;
-}
-
-.form-group textarea {
-  height: 180px;
-  resize: none;
-}
-
-/* Formspree Validation Engine States */
-.form-group [aria-invalid="true"] {
-  box-shadow: 0 0 0 2px #ef4444 !important;
-}
-
-.field-error {
-  font-size: 0.8rem;
-  color: #ef4444;
-  margin-top: 2px;
+.custom-form textarea {
+  height: 150px;
 }
 
 .btn-submit {
   background: #38bdf8;
-  color: black;
-  padding: 16px;
+  padding: 14px;
   border: none;
-  border-radius: 10px;
+  width: 100%;
   font-weight: 600;
-  font-size: 16px;
   cursor: pointer;
-  transition: 0.3s;
+  border-radius: 8px;
 }
 
 .btn-submit:hover {
   background: white;
 }
 
-.btn-submit:disabled {
-  background: #64748b;
-  color: #cbd5e1;
-  cursor: not-allowed;
-}
-
-.form-alert {
-  padding: 16px;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  margin-bottom: 20px;
-  font-weight: 500;
-}
-
-.success-message {
-  background-color: #065f46;
-  border: 1px solid #34d399;
-  color: #a7f3d0;
-}
-
-.error-message {
-  background-color: #991b1b;
-  border: 1px solid #f87171;
-  color: #fca5a5;
-}
-
-/* ==========================================================================
-   8. FOOTER
-   ========================================================================== */
+/* =========================
+   FOOTER
+========================= */
 footer {
   text-align: center;
-  padding: 40px 20px;
+  padding: 30px;
   background: #111827;
   color: #cbd5e1;
 }
 
-footer .footer-contacts {
-  margin-bottom: 15px;
-  font-size: 14px;
-}
-
-footer .footer-contacts a {
-  color: #38bdf8;
-  text-decoration: none;
-  margin: 0 10px;
-  transition: 0.3s;
-}
-
-footer .footer-contacts a:hover {
-  color: white;
-}
-
-/* ==========================================================================
-   9. MEDIA QUERIES (RESPONSIVE ALIGNMENTS FOR MOBILE & TABLETS)
-   ========================================================================== */
-@media(max-width: 900px) {
-  header {
-    padding: 20px 5%;
-  }
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 900px) {
 
   .hero {
     flex-direction: column;
     text-align: center;
-    padding-top: 40px;
-    justify-content: center;
-  }
-
-  .hero-text h1 {
-    font-size: 45px;
-  }
-
-  .hero-text h2 {
-    font-size: 25px;
   }
 
   .hero-image img {
-    width: 280px;
+    width: 260px;
   }
 
   .contact-wrapper {
     grid-template-columns: 1fr;
-    gap: 30px;
-  }
-
-  .form-row {
-    flex-direction: column;
-    gap: 20px;
   }
 }

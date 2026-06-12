@@ -1,281 +1,73 @@
-<!DOCTYPE html>
-<html>
-<head>
-
-<title>JoyTech Login</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="stylesheet" href="style.css">
-
-</head>
-
-
-<body>
-
-
-<div class="auth-box">
-
-<h1>JoyTech</h1>
-
-<p id="message"></p>
-
-
-<!-- LOGIN -->
-
-<div id="login">
-
-<h2>Login</h2>
-
-
-<input 
-id="loginEmail"
-type="email"
-placeholder="Email">
-
-
-<input 
-id="loginPassword"
-type="password"
-placeholder="Password">
-
-
-
-<button onclick="login()">
-Login
-</button>
-
-
-<p>
-No account?
-<span onclick="showSignup()">
-Create account
-</span>
-</p>
-
-
-</div>
-
-
-
-
-
-<!-- SIGNUP -->
-
-<div id="signup" style="display:none">
-
-
-<h2>Create Account</h2>
-
-
-<input 
-id="username"
-placeholder="Username">
-
-
-<input 
-id="email"
-type="email"
-placeholder="Email">
-
-
-
-<input 
-id="password"
-type="password"
-placeholder="Password">
-
-
-<button onclick="signup()">
-Signup
-</button>
-
-
-
-<p>
-
-Already have account?
-
-<span onclick="showLogin()">
-Login
-</span>
-
-</p>
-
-
-</div>
-
-
-</div>
-
-
-
-
-<script>
-
-
-function showSignup(){
-
-document.getElementById("login").style.display="none";
-
-document.getElementById("signup").style.display="block";
-
-}
-
-
-
-function showLogin(){
-
-document.getElementById("signup").style.display="none";
-
-document.getElementById("login").style.display="block";
-
-}
-
-
-
-
-function notify(text,color="white"){
-
-let box=document.getElementById("message");
-
-box.innerHTML=text;
-
-box.style.color=color;
-
-}
-
-
-
-
-async function signup(){
-
-
-let username =
-document.getElementById("username").value;
-
-
-let email =
-document.getElementById("email").value;
-
-
-let password =
-document.getElementById("password").value;
-
-
-
-let response =
-await fetch("/api/auth/signup",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-
-username,
-email,
-password
-
-})
-
-
-});
-
-
-
-let data=await response.json();
-
-
-
-if(response.ok){
-
-notify("Account created. Login now","lime");
-
-showLogin();
-
-}else{
-
-notify(data.error,"red");
-
-}
-
-
-}
-
-
-
-
-
-async function login(){
-
-
-let email =
-document.getElementById("loginEmail").value;
-
-
-let password =
-document.getElementById("loginPassword").value;
-
-
-
-let response =
-await fetch("/api/auth/login",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-
-body:JSON.stringify({
-
-email,
-password
-
-})
-
-
-});
-
-
-
-let data=await response.json();
-
-
-
-if(response.ok){
-
-
-localStorage.setItem(
-"joytech_token",
-data.token
-);
-
-
-
-window.location.href="/";
-
-
-
-}else{
-
-
-notify(data.error,"red");
-
-
-}
-
-
-}
-
-
-
-</script>
-
-
-</body>
-</html>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #0f172a;
+
+    /* ✅ CENTER EVERYTHING */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+
+  /* MAIN CARD */
+  .box {
+    width: 100%;
+    max-width: 380px;
+    background: #1e293b;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+
+  h2 {
+    text-align: center;
+    color: #38bdf8;
+    margin-bottom: 20px;
+  }
+
+  input, button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+  }
+
+  input {
+    background: #0f172a;
+    color: white;
+    border: 1px solid #334155;
+  }
+
+  button {
+    background: #38bdf8;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background: #0ea5e9;
+  }
+
+  .toggle {
+    text-align: center;
+    margin-top: 15px;
+    color: #94a3b8;
+    cursor: pointer;
+  }
+
+  .msg {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  .error { color: #ef4444; }
+  .success { color: #22c55e; }
+
+  .hidden { display: none; }
+</style>

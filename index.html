@@ -1,193 +1,314 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JoyTech Portfolio</title>
 
-  <!-- AUTH GUARD -->
-  <script>
-    const token = localStorage.getItem("joytech_token");
+<meta charset="UTF-8">
 
-    if (!token) {
-      window.location.replace("/auth");
-    }
-  </script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<title>JoyTech Portfolio</title>
+
+<link rel="stylesheet" href="style.css">
+
 </head>
+
 
 <body>
 
-  <!-- HEADER -->
-  <header>
-    <div class="logo">JoyTech</div>
 
-    <button class="menu-toggle" aria-label="menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
+<script>
 
-    <nav>
-      <a href="#home">Home</a>
-      <a href="#about">About</a>
-      <a href="#skills">Skills</a>
-      <a href="#projects">Projects</a>
-      <a href="#contact">Contact</a>
+if(!localStorage.getItem("joytech_token")){
+    window.location.href="/auth";
+}
 
-      <a href="#" id="logoutBtn" style="color:red;">Logout</a>
-    </nav>
-  </header>
+</script>
 
-  <!-- HERO -->
-  <section class="hero" id="home">
-    <div class="hero-text">
-      <h3>Hello, I'm</h3>
-      <h1>Joyce William</h1>
-      <h2>ICT Technician & Web Developer</h2>
-      <p>Passionate about web development, UI/UX design and mobile apps.</p>
-    </div>
 
-    <div class="hero-image">
-      <img src="image1.jpg" alt="profile">
-    </div>
-  </section>
 
-  <!-- ABOUT -->
-  <section id="about">
-    <h2>About Me</h2>
-    <p>I am an ICT Technician specializing in modern web systems and design.</p>
-  </section>
+<header>
 
-  <!-- SKILLS -->
-  <section id="skills">
-    <h2>Skills</h2>
-    <div class="skills-container">
-      <div class="skill-card">HTML</div>
-      <div class="skill-card">CSS</div>
-      <div class="skill-card">JavaScript</div>
-      <div class="skill-card">Flutter</div>
-      <div class="skill-card">UI/UX</div>
-    </div>
-  </section>
+<h2>JoyTech</h2>
 
-  <!-- PROJECTS -->
-  <section id="projects">
-    <h2>Projects</h2>
 
-    <div class="project-container">
-      <div class="project-card">
-        <img src="image.png">
-        <h3>Calculator App</h3>
-      </div>
+<nav>
 
-      <div class="project-card">
-        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085">
-        <h3>Portfolio Website</h3>
-      </div>
-    </div>
-  </section>
+<a href="#home">Home</a>
+<a href="#about">About</a>
+<a href="#skills">Skills</a>
+<a href="#projects">Projects</a>
+<a href="#contact">Contact</a>
 
-  <!-- CONTACT -->
-  <section id="contact">
-    <h2>Contact Me</h2>
+<button id="logoutBtn">
+Logout
+</button>
 
-    <!-- SUCCESS POPUP (FIXED) -->
-    <div id="successPopup"
-         style="display:none; background:#16a34a; color:white; padding:10px; margin-bottom:10px; border-radius:6px;">
-      ✓ Message sent successfully! I will get back to you shortly.
-    </div>
 
-    <div class="contact-wrapper">
-      <form id="contact-form">
+</nav>
 
-        <input type="text" name="name" placeholder="Your Name" required>
-        <input type="email" name="email" placeholder="Your Email" required>
+</header>
 
-        <select name="service" required>
-          <option value="">Select Service</option>
-          <option>Web Design</option>
-          <option>Mobile App</option>
-          <option>UI/UX</option>
-        </select>
 
-        <textarea name="message" placeholder="Message" required></textarea>
 
-        <button type="submit" class="btn-submit">Send Message</button>
-      </form>
-    </div>
-  </section>
 
-  <!-- FOOTER -->
-  <footer>
-    <p>© 2026 JoyTech Portfolio</p>
-  </footer>
 
-  <!-- LOGOUT -->
-  <script>
-    document.getElementById("logoutBtn").addEventListener("click", (e) => {
-      e.preventDefault();
-      localStorage.removeItem("joytech_token");
-      window.location.href = "/auth";
-    });
-  </script>
+<section class="hero" id="home">
 
-  <!-- MENU -->
-  <script>
-    const menuToggle = document.querySelector(".menu-toggle");
-    const nav = document.querySelector("nav");
 
-    menuToggle.addEventListener("click", () => {
-      nav.classList.toggle("active");
-      menuToggle.classList.toggle("active");
-    });
-  </script>
+<div>
 
-  <!-- CONTACT FORM FIX -->
-  <script>
-    const form = document.getElementById("contact-form");
-    const popup = document.getElementById("successPopup");
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+<h3>Hello, I'm</h3>
 
-      popup.style.display = "none";
+<h1>Joyce William</h1>
 
-      const data = {
-        name: form.name.value,
-        email: form.email.value,
-        service: form.service.value,
-        message: form.message.value
-      };
 
-      try {
-        const res = await fetch("/api/contact", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
+<h2>
+ICT Technician & Web Developer
+</h2>
 
-        const result = await res.json();
 
-        if (!res.ok) throw new Error(result.error);
+<p>
+I create websites, applications and digital solutions.
+</p>
 
-        // ✅ SHOW SUCCESS POPUP
-        popup.style.display = "block";
 
-        form.reset();
+<a class="btn" href="#projects">
+View Projects
+</a>
 
-        setTimeout(() => {
-          popup.style.display = "none";
-        }, 4000);
 
-      } catch (err) {
-        alert("Message failed: " + err.message);
-      }
-    });
-  </script>
+</div>
+
+
+
+<img src="image1.jpg">
+
+
+</section>
+
+
+
+
+
+
+<section id="about">
+
+
+<h1>About Me</h1>
+
+
+<p>
+
+ICT Technician passionate about software,
+web development and UI/UX design.
+
+</p>
+
+
+</section>
+
+
+
+
+
+
+<section id="skills">
+
+
+<h1>Skills</h1>
+
+
+<div class="cards">
+
+
+<div>HTML</div>
+
+<div>CSS</div>
+
+<div>JavaScript</div>
+
+<div>Flutter</div>
+
+<div>UI/UX</div>
+
+<div>Canva</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+<section id="projects">
+
+
+<h1>Projects</h1>
+
+
+
+<div class="cards">
+
+
+<div>
+
+<h3>Calculator App</h3>
+
+<p>
+Mobile calculator application
+</p>
+
+</div>
+
+
+
+<div>
+
+<h3>Portfolio Website</h3>
+
+<p>
+Modern responsive website
+</p>
+
+</div>
+
+
+
+
+<div>
+
+<h3>Design Projects</h3>
+
+<p>
+Posters and graphics
+</p>
+
+</div>
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section id="contact">
+
+
+<h1>Contact Me</h1>
+
+
+
+<div id="successPopup">
+
+✓ Message sent successfully! I will get back to you shortly.
+
+</div>
+
+
+
+<form id="contact-form">
+
+
+<input 
+name="name"
+placeholder="Your Name"
+required>
+
+
+
+<input 
+name="email"
+type="email"
+placeholder="Your Email"
+required>
+
+
+
+
+<select name="service">
+
+
+<option>
+Select Service
+</option>
+
+<option>
+Website
+</option>
+
+
+<option>
+Mobile App
+</option>
+
+
+<option>
+Graphics
+</option>
+
+
+</select>
+
+
+
+
+
+<textarea
+name="message"
+placeholder="Message"
+required>
+
+</textarea>
+
+
+
+
+<button>
+
+Send Message
+
+</button>
+
+
+
+</form>
+
+
+
+</section>
+
+
+
+
+
+
+<footer>
+
+© 2026 JoyTech Portfolio
+
+</footer>
+
+
+
+<script src="script.js"></script>
+
 
 </body>
+
 </html>

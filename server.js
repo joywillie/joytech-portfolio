@@ -1,113 +1,87 @@
-const express = require("express");
-const path = require("path");
-const cors = require("cors");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { Pool } = require("pg");
-require("dotenv").config();
+const express = require('express');
+const cors = require('cors');
+const { Pool } = require('pg');
+path = require('path');
+require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 10000;
 
-/* =========================
-   MIDDLEWARE
-========================= */
+// Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
 
-/* =========================
-   DATABASE (NEON POSTGRES)
-========================= */
+// SERVE FRONTEND: This tells Express to serve your HTML, CSS, and images straight out of your folder
+app.use(express.static(__dirname));
+
+// Database Connection Configuration (Connecting to your Neon Console DB)
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false // Required for secure serverless connections to Neon SQL
+    }
 });
 
-pool.connect()
-  .then(() => console.log("Database connected successfully"))
-  .catch(err => console.log("DB connection error:", err.message));
+// Automatically initialize your SQL table on startup if it doesn't exist
+const initDB = async () => {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS messages (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(100) NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+        console.log("Neon SQL database initialized successfully.");
+    } catch (err) {
+        console.error("Error initializing SQL database:", err);
+    }
+};
+initDB();
 
-/* =========================
-   ROUTES (FRONTEND PAGES)
-========================= */
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+// ROOT ROUTE: Serves your actual styled portfolio website instead of raw text
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get("/auth", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "auth.html"));
-});
-
-/* =========================
-   SIGNUP
-========================= */
-app.post("/api/auth/signup", async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-
-    if (!username || !email || !password) {
-      return res.status(400).json({ error: "All fields required" });
+// API ROUTE: Handle Contact Form Submissions and save them to Neon SQL
+app.post('/api/contact', async (req, res) => {
+    const { name, email, message } = req.body;
+    
+    if (!name || !email || !message) {
+        return res.status(400).json({ error: "Please provide name, email, and a message." });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await pool.query(
-      "INSERT INTO users (username, email, password) VALUES ($1, $2, $3)",
-      [username, email, hashedPassword]
-    );
-
-    res.json({ message: "User created successfully" });
-
-  } catch (err) {
-    console.log("Signup error:", err.message);
-    res.status(500).json({ error: "Signup failed" });
-  }
+    try {
+        const queryText = 'INSERT INTO messages(name, email, message) VALUES($1, $2, $3) RETURNING *';
+        const values = [name, email, message];
+        const result = await pool.query(queryText, values);
+        
+        res.status(201).json({ 
+            success: true, 
+            message: "Message saved to Neon SQL successfully!",
+            data: result.rows[0] 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Database error. Could not save message." });
+    }
 });
 
-/* =========================
-   LOGIN
-========================= */
-app.post("/api/auth/signin", async (req, res) => {
-  try {
-    const { userKey, password } = req.body;
-
-    const userResult = await pool.query(
-      "SELECT * FROM users WHERE email=$1 OR username=$1",
-      [userKey]
-    );
-
-    if (userResult.rows.length === 0) {
-      return res.status(400).json({ error: "User not found" });
+// API ROUTE: Securely retrieve messages from your dashboard
+app.get('/api/messages', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM messages ORDER BY created_at DESC');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Database error. Could not fetch messages." });
     }
-
-    const user = userResult.rows[0];
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.status(400).json({ error: "Invalid password" });
-    }
-
-    const token = jwt.sign(
-      { id: user.id, username: user.username },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-    res.json({ token });
-
-  } catch (err) {
-    console.log("Login error:", err.message);
-    res.status(500).json({ error: "Login failed" });
-  }
 });
 
-/* =========================
-   SERVER START
-========================= */
-app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
+// Set port for deployment
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running successfully on port ${PORT}`);
 });

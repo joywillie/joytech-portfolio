@@ -1,298 +1,199 @@
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Poppins,Arial,sans-serif;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JoyTech | Secure Login</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .box {
+      width: 380px;
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 12px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #38bdf8;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+    }
+
+    input {
+      background: #0f172a;
+      color: white;
+      border: 1px solid #334155;
+    }
+
+    button {
+      background: #38bdf8;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #0ea5e9;
+    }
+
+    .toggle {
+      text-align: center;
+      margin-top: 15px;
+      color: #94a3b8;
+      cursor: pointer;
+    }
+
+    .msg {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .error { color: #ef4444; }
+    .success { color: #22c55e; }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+
+  <h2>JoyTech Access</h2>
+
+  <!-- MESSAGE -->
+  <div id="msg" class="msg"></div>
+
+  <!-- SIGNUP -->
+  <div id="signupBox">
+    <input id="su_name" type="text" placeholder="Username">
+    <input id="su_email" type="email" placeholder="Email">
+    <input id="su_password" type="password" placeholder="Password">
+
+    <button onclick="signup()">Create Account</button>
+
+    <div class="toggle" onclick="showLogin()">
+      Already have an account? Login
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="loginBox" class="hidden">
+    <input id="li_user" type="text" placeholder="Username or Email">
+    <input id="li_pass" type="password" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+
+    <div class="toggle" onclick="showSignup()">
+      Create new account
+    </div>
+  </div>
+
+</div>
+
+<script>
+const msg = document.getElementById("msg");
+const signupBox = document.getElementById("signupBox");
+const loginBox = document.getElementById("loginBox");
+
+function showLogin(){
+  signupBox.classList.add("hidden");
+  loginBox.classList.remove("hidden");
+  msg.innerText = "";
 }
 
-
-body{
-
-background:#0f172a;
-color:white;
-line-height:1.6;
-
+function showSignup(){
+  loginBox.classList.add("hidden");
+  signupBox.classList.remove("hidden");
+  msg.innerText = "";
 }
 
+/* =========================
+   SIGNUP
+========================= */
+async function signup() {
+  msg.innerText = "";
 
+  const res = await fetch("/api/auth/signup", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      username: su_name.value,
+      email: su_email.value,
+      password: su_password.value
+    })
+  });
 
-header{
+  const data = await res.json();
 
-position:fixed;
-top:0;
-width:100%;
-background:#111827;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:20px 8%;
-z-index:1000;
-
+  if (res.ok) {
+    msg.className = "msg success";
+    msg.innerText = "Account created! Please login.";
+    showLogin();
+  } else {
+    msg.className = "msg error";
+    msg.innerText = data.error || "Signup failed";
+  }
 }
 
+/* =========================
+   LOGIN
+========================= */
+async function login() {
+  msg.innerText = "";
 
-header h2{
+  const res = await fetch("/api/auth/signin", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      userKey: li_user.value,
+      password: li_pass.value
+    })
+  });
 
-color:#38bdf8;
+  const data = await res.json();
 
+  if (res.ok) {
+    // IMPORTANT FIX (your main issue before)
+    localStorage.setItem("joytech_token", data.token);
+
+    msg.className = "msg success";
+    msg.innerText = "Login successful...";
+
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 1000);
+
+  } else {
+    msg.className = "msg error";
+    msg.innerText = data.error || "Login failed";
+  }
 }
+</script>
 
-
-
-nav{
-
-display:flex;
-gap:20px;
-align-items:center;
-
-}
-
-
-nav a{
-
-color:white;
-text-decoration:none;
-
-}
-
-
-#logoutBtn{
-
-background:#ef4444;
-border:none;
-color:white;
-padding:8px 15px;
-border-radius:8px;
-cursor:pointer;
-
-}
-
-
-
-
-
-section{
-
-padding:100px 8%;
-
-}
-
-
-
-
-
-.hero{
-
-min-height:100vh;
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:40px;
-
-}
-
-
-
-.hero h1{
-
-font-size:60px;
-color:#38bdf8;
-
-}
-
-
-
-.hero img{
-
-width:350px;
-border-radius:20px;
-
-}
-
-
-
-
-
-.btn,
-button{
-
-background:#38bdf8;
-color:black;
-border:none;
-padding:12px 25px;
-border-radius:8px;
-cursor:pointer;
-text-decoration:none;
-
-}
-
-
-
-
-
-
-
-.cards{
-
-display:grid;
-grid-template-columns:
-repeat(auto-fit,minmax(200px,1fr));
-
-gap:20px;
-
-}
-
-
-
-.cards div{
-
-background:#1e293b;
-padding:30px;
-border-radius:15px;
-text-align:center;
-
-}
-
-
-
-
-
-form{
-
-max-width:500px;
-display:flex;
-flex-direction:column;
-gap:15px;
-
-}
-
-
-
-input,
-textarea,
-select{
-
-
-padding:15px;
-border-radius:10px;
-border:none;
-background:#1e293b;
-color:white;
-
-}
-
-
-
-textarea{
-
-height:150px;
-
-}
-
-
-
-
-#successPopup{
-
-display:none;
-background:#16a34a;
-padding:15px;
-border-radius:10px;
-margin-bottom:20px;
-
-}
-
-
-
-
-footer{
-
-text-align:center;
-background:#111827;
-padding:30px;
-
-}
-
-
-
-
-
-
-
-.auth-box{
-
-width:90%;
-max-width:400px;
-margin:100px auto;
-background:#1e293b;
-padding:40px;
-border-radius:20px;
-
-}
-
-
-
-.auth-box input{
-
-width:100%;
-margin:10px 0;
-
-}
-
-
-
-.auth-box button{
-
-width:100%;
-
-}
-
-
-
-.auth-box span{
-
-color:#38bdf8;
-cursor:pointer;
-
-}
-
-
-
-
-
-
-@media(max-width:800px){
-
-
-.hero{
-
-flex-direction:column;
-text-align:center;
-
-}
-
-
-
-.hero h1{
-
-font-size:40px;
-
-}
-
-
-
-nav{
-
-display:none;
-
-}
-
-
-header{
-
-padding:20px;
-
-}
-
-
-}
+</body>
+</html>

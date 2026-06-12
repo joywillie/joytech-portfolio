@@ -1,188 +1,281 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JoyTech | Secure Login</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>JoyTech Login</title>
 
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #0f172a;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    .box {
-      width: 380px;
-      background: #111827;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    }
+<link rel="stylesheet" href="style.css">
 
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #38bdf8;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 6px;
-      background: #1e293b;
-      color: white;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #38bdf8;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #0ea5e9;
-    }
-
-    .toggle {
-      text-align: center;
-      margin-top: 10px;
-      cursor: pointer;
-      color: #94a3b8;
-    }
-
-    .toggle:hover {
-      color: #38bdf8;
-    }
-
-    .msg {
-      text-align: center;
-      margin-bottom: 10px;
-      font-size: 14px;
-    }
-
-    .error { color: #f87171; }
-    .success { color: #34d399; }
-  </style>
 </head>
+
 
 <body>
 
-<div class="box">
 
-  <h2 id="title">Login</h2>
+<div class="auth-box">
 
-  <div id="msg" class="msg"></div>
+<h1>JoyTech</h1>
 
-  <!-- SIGNUP -->
-  <div id="signupBox" style="display:none;">
-    <input id="su_username" placeholder="Username">
-    <input id="su_email" placeholder="Email">
-    <input id="su_password" type="password" placeholder="Password">
-    <button onclick="signup()">Create Account</button>
-    <div class="toggle" onclick="toggle()">Already have account? Login</div>
-  </div>
+<p id="message"></p>
 
-  <!-- LOGIN -->
-  <div id="loginBox">
-    <input id="li_user" placeholder="Username or Email">
-    <input id="li_password" type="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <div class="toggle" onclick="toggle()">Create new account</div>
-  </div>
+
+<!-- LOGIN -->
+
+<div id="login">
+
+<h2>Login</h2>
+
+
+<input 
+id="loginEmail"
+type="email"
+placeholder="Email">
+
+
+<input 
+id="loginPassword"
+type="password"
+placeholder="Password">
+
+
+
+<button onclick="login()">
+Login
+</button>
+
+
+<p>
+No account?
+<span onclick="showSignup()">
+Create account
+</span>
+</p>
+
 
 </div>
 
+
+
+
+
+<!-- SIGNUP -->
+
+<div id="signup" style="display:none">
+
+
+<h2>Create Account</h2>
+
+
+<input 
+id="username"
+placeholder="Username">
+
+
+<input 
+id="email"
+type="email"
+placeholder="Email">
+
+
+
+<input 
+id="password"
+type="password"
+placeholder="Password">
+
+
+<button onclick="signup()">
+Signup
+</button>
+
+
+
+<p>
+
+Already have account?
+
+<span onclick="showLogin()">
+Login
+</span>
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+
+
 <script>
-let isLogin = true;
 
-function toggle() {
-  isLogin = !isLogin;
 
-  document.getElementById("signupBox").style.display = isLogin ? "none" : "block";
-  document.getElementById("loginBox").style.display = isLogin ? "block" : "none";
-  document.getElementById("title").innerText = isLogin ? "Login" : "Sign Up";
-  document.getElementById("msg").innerText = "";
+function showSignup(){
+
+document.getElementById("login").style.display="none";
+
+document.getElementById("signup").style.display="block";
+
 }
 
-// =====================
-// SIGNUP
-// =====================
-async function signup() {
-  const username = document.getElementById("su_username").value;
-  const email = document.getElementById("su_email").value;
-  const password = document.getElementById("su_password").value;
 
-  try {
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password })
-    });
 
-    const data = await res.json();
+function showLogin(){
 
-    if (!res.ok) throw new Error(data.error);
+document.getElementById("signup").style.display="none";
 
-    document.getElementById("msg").innerHTML =
-      "<span class='success'>Account created successfully</span>";
+document.getElementById("login").style.display="block";
 
-    toggle();
-
-  } catch (err) {
-    document.getElementById("msg").innerHTML =
-      "<span class='error'>" + err.message + "</span>";
-  }
 }
 
-// =====================
-// LOGIN
-// =====================
-async function login() {
-  const userKey = document.getElementById("li_user").value;
-  const password = document.getElementById("li_password").value;
 
-  try {
-    const res = await fetch("/api/auth/signin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userKey, password })
-    });
 
-    const data = await res.json();
 
-    if (!res.ok) throw new Error(data.error);
+function notify(text,color="white"){
 
-    // ✅ IMPORTANT FIX (TOKEN STORAGE)
-    localStorage.setItem("joytech_token", data.token);
+let box=document.getElementById("message");
 
-    document.getElementById("msg").innerHTML =
-      "<span class='success'>Login successful! Redirecting...</span>";
+box.innerHTML=text;
 
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 1000);
+box.style.color=color;
 
-  } catch (err) {
-    document.getElementById("msg").innerHTML =
-      "<span class='error'>" + err.message + "</span>";
-  }
 }
+
+
+
+
+async function signup(){
+
+
+let username =
+document.getElementById("username").value;
+
+
+let email =
+document.getElementById("email").value;
+
+
+let password =
+document.getElementById("password").value;
+
+
+
+let response =
+await fetch("/api/auth/signup",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+username,
+email,
+password
+
+})
+
+
+});
+
+
+
+let data=await response.json();
+
+
+
+if(response.ok){
+
+notify("Account created. Login now","lime");
+
+showLogin();
+
+}else{
+
+notify(data.error,"red");
+
+}
+
+
+}
+
+
+
+
+
+async function login(){
+
+
+let email =
+document.getElementById("loginEmail").value;
+
+
+let password =
+document.getElementById("loginPassword").value;
+
+
+
+let response =
+await fetch("/api/auth/login",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+
+body:JSON.stringify({
+
+email,
+password
+
+})
+
+
+});
+
+
+
+let data=await response.json();
+
+
+
+if(response.ok){
+
+
+localStorage.setItem(
+"joytech_token",
+data.token
+);
+
+
+
+window.location.href="/";
+
+
+
+}else{
+
+
+notify(data.error,"red");
+
+
+}
+
+
+}
+
+
+
 </script>
+
 
 </body>
 </html>
